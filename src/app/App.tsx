@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { Route, Switch, useLocation } from "react-router-dom";
 import HomePage from "./screens/homePage";
 import { ProductsPage } from "./screens/productsPage";
@@ -19,6 +19,7 @@ import { SellerPage } from "./screens/sellerPage/SellerPage";
 import { SocketProvider } from "./context/SocketContext";
 import { useDeviceType } from "./hooks/useDeviceType";
 import { Seo } from "./components/Seo";
+import { NotFoundPage } from "./screens/notFoundPage";
 import "../css/app.css";
 import "../css/navbar.css";
 import "../css/footer.css";
@@ -31,17 +32,36 @@ import "../css/order.css";
 import "../css/mobile-layout.css";
 import "../css/help.css";
 import "../css/check-out.css";
+import "../css/coupang.css";
 
 function App() {
   const location = useLocation();
   const { isTouchLayout } = useDeviceType();
+  const normalizedPath = location.pathname.length > 1
+    ? location.pathname.replace(/\/+$/, "")
+    : location.pathname;
 
-  const isAuthRoute = location.pathname === "/login" || location.pathname === "/signup";
-  const showMobileShell = isTouchLayout;
+  useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
+    return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.key, location.pathname, location.search, location.hash]);
+
+  const isAuthRoute = normalizedPath === "/login" || normalizedPath === "/signup";
+  const showMobileShell = isTouchLayout && !isAuthRoute;
   const showMobileBottomNav = isTouchLayout && !isAuthRoute;
-  const showFooter = !isTouchLayout || isAuthRoute;
+  const showFooter = !isTouchLayout && !isAuthRoute;
 
-  const seoConfig = getSeoConfig(location.pathname);
+  const seoConfig = getSeoConfig(normalizedPath);
 
   return (
     <ContextProvider>
@@ -49,23 +69,24 @@ function App() {
         <SocketProvider>
         <WishlistProvider>
         <Seo {...seoConfig} />
-        {showMobileShell ? (
+        {isAuthRoute ? null : showMobileShell ? (
           <MobileHeader />
         ) : (
-          location.pathname === "/" ? <HomeNavbar /> : <OtherNavbar />
+          normalizedPath === "/" ? <HomeNavbar /> : <OtherNavbar />
         )}
 
-        <div className={showMobileShell ? "mobile-layout-content" : undefined}>
+        <div className={`${showMobileShell ? "mobile-layout-content" : ""} app-route-content ${isAuthRoute ? "auth-route-content" : ""}`.trim()}>
           <Switch>
             <Route path="/products" component={ProductsPage} />
-            <Route path="/orders" component={OrdersPage} />
-            <Route path="/help" component={HelpPage} />
-            <Route path="/profile" component={MyPage} />
-            <Route path="/checkout" component={CheckoutPage} />
-            <Route path="/user/seller/:id" component={SellerPage} />
-            <Route path="/login" component={Login} />
-            <Route path="/signup" component={Signup} />
-            <Route path="/" component={HomePage} />
+            <Route exact path="/orders" component={OrdersPage} />
+            <Route exact path="/help" component={HelpPage} />
+            <Route exact path="/profile" component={MyPage} />
+            <Route exact path="/checkout" component={CheckoutPage} />
+            <Route exact path="/user/seller/:id" component={SellerPage} />
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/signup" component={Signup} />
+            <Route exact path="/" component={HomePage} />
+            <Route component={NotFoundPage} />
           </Switch>
         </div>
 
@@ -83,7 +104,7 @@ export default App;
 function getSeoConfig(pathname: string) {
   const siteName = "FENZO";
   const baseDescription =
-    "FENZO is an online marketplace for electronics, fashion, beauty, home essentials, and daily shopping.";
+    "FENZO is an online shopping platform for electronics, fashion, beauty, home essentials, and daily shopping.";
 
   if (pathname === "/") {
     return {
@@ -95,7 +116,7 @@ function getSeoConfig(pathname: string) {
   if (pathname.startsWith("/products")) {
     return {
       title: `${siteName} | Products`,
-      description: "Browse FENZO products by category and discover the latest deals.",
+      description: "Browse FENZO products by category.",
     };
   }
 

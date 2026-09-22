@@ -20,6 +20,8 @@ type TranslationMap = {
   home: string;
   products: string;
   electronics: string;
+  beauty: string;
+  health: string;
   beautyHealth: string;
   fashion: string;
   kids: string;
@@ -54,13 +56,7 @@ type TranslationMap = {
   creatingAccount: string;
   dontHaveAccount: string;
   alreadyHaveAccount: string;
-  categoryAllProducts: string;
   categoryParfum: string;
-  productsCategories: string;
-  productsSortBy: string;
-  productsNewest: string;
-  productsLowPrice: string;
-  productsHighPrice: string;
   addToWishlist: string;
   removeFromWishlist: string;
   addCart: string;
@@ -87,6 +83,8 @@ const en: TranslationMap = {
   home: "Home",
   products: "Products",
   electronics: "Electronics",
+  beauty: "Beauty",
+  health: "Health",
   beautyHealth: "Beauty & Health",
   fashion: "Fashion",
   kids: "Kids",
@@ -121,13 +119,7 @@ const en: TranslationMap = {
   creatingAccount: "Creating account...",
   dontHaveAccount: "Don't have an account? Sign up",
   alreadyHaveAccount: "Already have an account? Login",
-  categoryAllProducts: "All Products",
   categoryParfum: "Parfum",
-  productsCategories: "Categories",
-  productsSortBy: "Sort By",
-  productsNewest: "Newest",
-  productsLowPrice: "Low Price",
-  productsHighPrice: "High Price",
   addToWishlist: "Add to wishlist",
   removeFromWishlist: "Remove from wishlist",
   addCart: "Add Cart",
@@ -154,6 +146,8 @@ const uz: TranslationMap = {
   home: "Bosh sahifa",
   products: "Mahsulotlar",
   electronics: "Elektronika",
+  beauty: "Go'zallik",
+  health: "Sog'liq",
   beautyHealth: "Go'zallik va sog'liq",
   fashion: "Moda",
   kids: "Bolalar",
@@ -188,13 +182,7 @@ const uz: TranslationMap = {
   creatingAccount: "Akkaunt yaratilmoqda...",
   dontHaveAccount: "Akkauntingiz yo'qmi? Ro'yxatdan o'ting",
   alreadyHaveAccount: "Akkauntingiz bormi? Kiring",
-  categoryAllProducts: "Barcha mahsulotlar",
   categoryParfum: "Atirlar",
-  productsCategories: "Kategoriyalar",
-  productsSortBy: "Saralash",
-  productsNewest: "Eng yangilari",
-  productsLowPrice: "Arzon narx",
-  productsHighPrice: "Yuqori narx",
   addToWishlist: "Sevimlilarga qo'shish",
   removeFromWishlist: "Sevimlilardan olib tashlash",
   addCart: "Savatga qo'shish",
@@ -221,6 +209,8 @@ const ko: TranslationMap = {
   home: "홈",
   products: "상품",
   electronics: "전자제품",
+  beauty: "뷰티",
+  health: "건강",
   beautyHealth: "뷰티 & 건강",
   fashion: "패션",
   kids: "키즈",
@@ -255,13 +245,7 @@ const ko: TranslationMap = {
   creatingAccount: "계정 생성 중...",
   dontHaveAccount: "계정이 없으신가요? 회원가입",
   alreadyHaveAccount: "이미 계정이 있나요? 로그인",
-  categoryAllProducts: "전체 상품",
   categoryParfum: "향수",
-  productsCategories: "카테고리",
-  productsSortBy: "정렬 기준",
-  productsNewest: "최신순",
-  productsLowPrice: "낮은 가격",
-  productsHighPrice: "높은 가격",
   addToWishlist: "위시리스트에 추가",
   removeFromWishlist: "위시리스트에서 제거",
   addCart: "장바구니 추가",

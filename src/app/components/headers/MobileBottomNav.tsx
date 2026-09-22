@@ -1,26 +1,26 @@
 import React from "react";
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
-import StorefrontIcon from "@mui/icons-material/Storefront";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import PersonIcon from "@mui/icons-material/Person";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
+import ReceiptLongRoundedIcon from "@mui/icons-material/ReceiptLongRounded";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import { useHistory, useLocation } from "react-router-dom";
 import { useGlobals } from "../../hooks/useGlobals";
 import { TranslationKey } from "../../i18n/translations";
 
 const navItems: Array<{ labelKey: TranslationKey; value: string; icon: React.ReactNode }> = [
-  { labelKey: "home", value: "/", icon: <HomeIcon /> },
-  { labelKey: "products", value: "/products/ALL", icon: <StorefrontIcon /> },
-  { labelKey: "orders", value: "/orders", icon: <ReceiptLongIcon /> },
-  { labelKey: "profile", value: "/profile", icon: <PersonIcon /> },
-  { labelKey: "help", value: "/help", icon: <HelpOutlineIcon /> },
+  { labelKey: "home", value: "/", icon: <HomeRoundedIcon /> },
+  { labelKey: "products", value: "/products", icon: <StorefrontRoundedIcon /> },
+  { labelKey: "orders", value: "/orders", icon: <ReceiptLongRoundedIcon /> },
+  { labelKey: "profile", value: "/profile", icon: <PersonRoundedIcon /> },
+  { labelKey: "help", value: "/help", icon: <HelpOutlineRoundedIcon /> },
 ];
 
 function resolveCurrentPath(pathname: string): string {
   const found = navItems.find((item) => pathname === item.value || pathname.startsWith(item.value + "/"));
   if (found) return found.value;
-  if (pathname.startsWith("/products")) return "/products/ALL";
+  if (pathname.startsWith("/products")) return "/products";
   if (pathname.startsWith("/profile")) return "/profile";
   if (pathname.startsWith("/orders")) return "/orders";
   if (pathname.startsWith("/help")) return "/help";
@@ -34,7 +34,13 @@ export function MobileBottomNav() {
   const current = resolveCurrentPath(location.pathname);
 
   return (
-    <Paper elevation={8} className="mobile-bottom-nav-wrap">
+    <Paper
+      component="nav"
+      aria-label="Primary navigation"
+      elevation={0}
+      square
+      className="mobile-bottom-nav-wrap"
+    >
       <BottomNavigation
         showLabels
         value={current}
@@ -47,6 +53,7 @@ export function MobileBottomNav() {
             label={t(item.labelKey)}
             value={item.value}
             icon={item.icon}
+            aria-label={t(item.labelKey)}
           />
         ))}
       </BottomNavigation>

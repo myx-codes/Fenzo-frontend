@@ -8,6 +8,27 @@ function getCartStorageKey(userId: string | null): string {
   return userId ? `${CART_STORAGE_PREFIX}_${userId}` : `${CART_STORAGE_PREFIX}_guest`;
 }
 
+function readCart(key: string): CartItem[] {
+  try {
+    const value = localStorage.getItem(key);
+    const parsed = value ? JSON.parse(value) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function mergeCarts(current: CartItem[], incoming: CartItem[]): CartItem[] {
+  const merged = new Map(current.map((item) => [item._id, { ...item }]));
+  incoming.forEach((item) => {
+    const existing = merged.get(item._id);
+    merged.set(item._id, existing
+      ? { ...existing, quantity: existing.quantity + (item.quantity ?? 1) }
+      : { ...item, quantity: item.quantity ?? 1 });
+  });
+  return Array.from(merged.values());
+}
+
 export default function useBasket() {
   const { authUser } = useGlobals();
   const userId = authUser?._id ?? null;
@@ -18,13 +39,20 @@ export default function useBasket() {
   // Load cart for current user when storage key changes (login/logout)
   useEffect(() => {
     if (typeof window === "undefined") return;
-    try {
-      const cartJson = localStorage.getItem(storageKey);
-      setCartItems(cartJson ? JSON.parse(cartJson) : []);
-    } catch {
-      setCartItems([]);
+    let next = readCart(storageKey);
+
+    if (userId) {
+      const guestKey = getCartStorageKey(null);
+      const guestCart = readCart(guestKey);
+      if (guestCart.length > 0) {
+        next = mergeCarts(next, guestCart);
+        localStorage.setItem(storageKey, JSON.stringify(next));
+        localStorage.removeItem(guestKey);
+      }
     }
-  }, [storageKey]);
+
+    setCartItems(next);
+  }, [storageKey, userId]);
 
   const persist = useCallback(
     (items: CartItem[]) => {

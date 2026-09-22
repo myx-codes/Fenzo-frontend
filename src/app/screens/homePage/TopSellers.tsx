@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Typography, Avatar, Button, Rating } from "@mui/material";
+import { Container, Typography, Avatar, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import { createSelector } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
@@ -15,7 +15,7 @@ const topSellerRetriever = createSelector(
 
 export function TopSellers() {
   const { topSellers } = useSelector(topSellerRetriever);
-  const { isTouchLayout, isMobile } = useDeviceType();
+  const { isTouchLayout } = useDeviceType();
   const list = Array.isArray(topSellers) ? topSellers : [];
 
   return (
@@ -23,18 +23,12 @@ export function TopSellers() {
       <Container maxWidth="xl">
         <div className="lp-section-head">
           <div>
-            <Typography className="lp-section-title">Top Sellers</Typography>
+            <span className="lp-section-eyebrow">Meet the sellers</span>
+            <Typography className="lp-section-title">Explore independent stores</Typography>
             <Typography className="lp-section-sub">
-              Verified stores with the highest ratings
+              Browse products from independent FENZO sellers.
             </Typography>
           </div>
-          <Button
-            component={Link}
-            to="/products/ALL"
-            className="lp-see-all-btn"
-          >
-            View all →
-          </Button>
         </div>
 
         <div className={isTouchLayout ? "sellers-scroll" : "sellers-grid"}>
@@ -44,21 +38,19 @@ export function TopSellers() {
             if (!sellerId) return null;
             return (
               <div key={String(sellerId)} className="seller-card">
-                <Avatar
-                  src={imagePath}
-                  alt={seller.userNick}
-                  className="seller-avatar"
-                />
+                <div className="seller-avatar-wrap">
+                  <Avatar
+                    src={seller.userImage ? imagePath : undefined}
+                    alt={seller.userNick}
+                    className="seller-avatar"
+                  >
+                    {(seller.userNick || "F").charAt(0).toUpperCase()}
+                  </Avatar>
+                </div>
                 <Typography className="seller-name">
                   {seller.userNick}
                 </Typography>
-                <Rating
-                  value={seller.userPoints}
-                  precision={0.1}
-                  readOnly
-                  size={isMobile ? "small" : "medium"}
-                  sx={{ "& .MuiRating-iconFilled": { color: "var(--gold)" } }}
-                />
+                <Typography className="seller-caption">FENZO seller</Typography>
                 <Button
                   component={Link}
                   to={`/user/seller/${sellerId}`}

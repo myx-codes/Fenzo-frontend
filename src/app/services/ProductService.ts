@@ -1,6 +1,13 @@
 import axios from "axios";
 import { serverApi } from "../../lib/config"
-import { Product, ProductInquiry } from "../../lib/types/product";
+import { Product, ProductInquiry, ProductReviewsResponse } from "../../lib/types/product";
+
+const ACCESS_TOKEN_KEY = "accessToken";
+
+function authHeaders() {
+    const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : undefined;
+}
  class ProductService {
     private readonly path: string;
 
@@ -45,7 +52,12 @@ import { Product, ProductInquiry } from "../../lib/types/product";
             const result = await axios.get(url);
             const data = result.data;
             if (Array.isArray(data)) return data;
-            const list = (data as any)?.value?.products ?? (data as any)?.products ?? (data as any)?.value ?? data;
+            const list =
+                (data as any)?.data?.products ??
+                (data as any)?.value?.products ??
+                (data as any)?.products ??
+                (data as any)?.value ??
+                data;
             return Array.isArray(list) ? list : [];
         } catch (err) {
             throw err;
@@ -59,7 +71,12 @@ import { Product, ProductInquiry } from "../../lib/types/product";
             const result = await axios.get(url);
             const data = result.data;
             if (Array.isArray(data)) return data;
-            const list = (data as any)?.value?.products ?? (data as any)?.products ?? (data as any)?.value ?? data;
+            const list =
+                (data as any)?.data?.products ??
+                (data as any)?.value?.products ??
+                (data as any)?.products ??
+                (data as any)?.value ??
+                data;
             return Array.isArray(list) ? list : [];
         } catch (err) {
             throw err;
@@ -96,6 +113,24 @@ import { Product, ProductInquiry } from "../../lib/types/product";
         const raw = result.data?.value ?? result.data;
         return (raw?.value?.product ?? raw?.value ?? raw) as Product;
       }
+
+    public async getProductReviews(productId: string): Promise<ProductReviewsResponse> {
+        const url = `${this.path}/customer/product/${productId}/reviews`;
+        const { data } = await axios.get<ProductReviewsResponse>(url);
+        return data;
+    }
+
+    public async saveProductReview(
+        productId: string,
+        input: { rating: number; comment: string },
+    ): Promise<ProductReviewsResponse> {
+        const url = `${this.path}/customer/product/${productId}/reviews`;
+        const { data } = await axios.post<ProductReviewsResponse>(url, input, {
+            withCredentials: true,
+            headers: authHeaders(),
+        });
+        return data;
+    }
 
  }
 

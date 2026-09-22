@@ -28,3 +28,32 @@ export interface ProductInquiry {
   productCollection?: ProductCollection;
   search?: string;
 }
+
+export interface ProductReviewUser {
+  _id: string;
+  userNick: string;
+  userImage?: string;
+}
+
+export interface ProductReview {
+  _id: string;
+  productId: string;
+  userId: ProductReviewUser | string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ProductReviewSummary {
+  average: number;
+  total: number;
+  distribution: Record<number, number>;
+}
+
+export interface ProductReviewsResponse {
+  reviews: ProductReview[];
+  summary: ProductReviewSummary;
+  page: number;
+  limit: number;
+}

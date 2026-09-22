@@ -21,6 +21,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
@@ -28,9 +29,11 @@ import PersonIcon from "@mui/icons-material/Person";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import EditIcon from "@mui/icons-material/Edit";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
+import RefreshRoundedIcon from "@mui/icons-material/RefreshRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 
 import { useGlobals } from "../../hooks/useGlobals";
 import { useWishlistContext } from "../../context/WishlistContext";
@@ -104,6 +107,7 @@ export function MyPage() {
 
   const [myOrders, setMyOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState("");
   const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>("ALL");
   const [ordersPage, setOrdersPage] = useState(1);
@@ -144,10 +148,16 @@ export function MyPage() {
 
   const fetchMyOrders = () => {
     setOrdersLoading(true);
+    setOrdersError("");
     orderService
       .getMyOrders({ page: 1, limit: 50 })
       .then(setMyOrders)
-      .catch(() => setMyOrders([]))
+      .catch((err) => {
+        setMyOrders([]);
+        setOrdersError(
+          err?.response?.data?.message || "We couldn't load your orders. Please try again."
+        );
+      })
       .finally(() => setOrdersLoading(false));
   };
 
@@ -160,9 +170,15 @@ export function MyPage() {
     setCancellingOrderId(id);
     orderService
       .updateOrder(id, "CANCELLED")
-      .then(() => fetchMyOrders())
+      .then(() => {
+        setOrdersError("");
+        fetchMyOrders();
+      })
       .catch((err) => {
         console.error("Cancel order failed", err?.response?.data ?? err);
+        setOrdersError(
+          err?.response?.data?.message || "We couldn't cancel this order. Please try again."
+        );
       })
       .finally(() => setCancellingOrderId(null));
   };
@@ -267,7 +283,9 @@ export function MyPage() {
         updatedUser = await userService.updateUser(authUser._id, input);
       }
 
-      setAuthUser({ ...authUser, ...updatedUser });
+      const nextUser = { ...authUser, ...updatedUser };
+      setAuthUser(nextUser);
+      localStorage.setItem("userData", JSON.stringify(nextUser));
       
       setInfoPassword("");
       setInfoPasswordConfirm("");
@@ -289,8 +307,8 @@ export function MyPage() {
 
   if (authUser === null) {
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "40vh" }}>
-        <CircularProgress sx={{ color: '#1e3c72' }} />
+      <Box className="account-auth-loading">
+        <CircularProgress sx={{ color: "#5b5bd6" }} />
       </Box>
     );
   }
@@ -300,7 +318,7 @@ export function MyPage() {
   const displayName = user.userNick || "User";
 
   const fenzoCardStyle = {
-    p: { xs: 3, md: 4 },
+    p: { xs: 2.25, md: 3 },
     borderRadius: 3,
     boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.03)",
     border: "1px solid #eaeaea",
@@ -308,32 +326,51 @@ export function MyPage() {
   };
 
   return (
-    <Box className="my-page" sx={{ bgcolor: "#f9fbfd", minHeight: "100vh", pt: 6, pb: 10 }}>
-      <Container maxWidth="lg">
-        <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, color: "#2b2b2b" }}>
-          My Account
-        </Typography>
+    <Box className="my-page" sx={{ bgcolor: "#f5f6fa", minHeight: "100vh", pt: 3, pb: 8 }}>
+      <Container maxWidth="xl">
+        <Box className="account-page-header">
+          <Box>
+            <Typography className="account-eyebrow">Account</Typography>
+            <Typography variant="h4">My Account</Typography>
+          </Box>
+          <Box className="account-header-stats" aria-label="Account summary">
+            <span><strong>{myOrders.length}</strong> Orders</span>
+            <span><strong>{wishlistItems.length}</strong> Saved</span>
+          </Box>
+        </Box>
 
-        <Grid container spacing={4}>
+        <Grid className="account-layout" container spacing={2.5}>
           {/* --- LEFT SIDEBAR --- */}
-          <Grid size={{ xs: 12, md: 4, lg: 3 }}>
-            <Card sx={{ ...fenzoCardStyle, p: 0, overflow: "hidden" }}>
-              <Box sx={{ p: 4, textAlign: "center", bgcolor: "#ffffff" }}>
+          <Grid className="account-sidebar-column" size={{ xs: 12, md: 4, lg: 3 }}>
+            <Card className="account-sidebar" sx={{ ...fenzoCardStyle, p: 0, overflow: "hidden" }}>
+              <Box className="account-profile-summary" sx={{ p: 4, textAlign: "center", bgcolor: "#ffffff" }}>
                 <Avatar 
+                  className="account-main-avatar"
                   src={avatarSrc} 
                   alt={displayName} 
-                  sx={{ width: 110, height: 110, fontSize: 40, mx: "auto", mb: 2, border: "4px solid #f0f4f8", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" }}
+                  sx={{ width: 82, height: 82, fontSize: 32, mx: "auto", mb: 1.5, border: "4px solid #f0f4f8", boxShadow: "0 4px 10px rgba(0,0,0,0.05)" }}
                 >
                   {displayName.charAt(0).toUpperCase()}
                 </Avatar>
                 <Typography variant="h6" sx={{ fontWeight: 700, color: "#333" }}>{displayName}</Typography>
                 <Typography variant="body2" sx={{ color: "#888", mt: 0.5 }}>{user.userPhone}</Typography>
+                <Box className="account-profile-metrics">
+                  <Box>
+                    <strong>{myOrders.length}</strong>
+                    <span>Orders</span>
+                  </Box>
+                  <Box>
+                    <strong>{wishlistItems.length}</strong>
+                    <span>Saved</span>
+                  </Box>
+                </Box>
               </Box>
               
               <Divider />
               
               <Box sx={{ p: 2 }}>
                 <Tabs
+                  className="account-tabs"
                   orientation="vertical"
                   value={tabValue}
                   onChange={handleTabChange}
@@ -348,11 +385,11 @@ export function MyPage() {
                       fontWeight: 600,
                       color: "#555",
                       fontSize: "0.95rem",
-                      "&:hover": { bgcolor: "#f4f7fb", color: "#0d6efd" }
+                      "&:hover": { bgcolor: "#f0f0ff", color: "#5b5bd6" }
                     },
                     "& .Mui-selected": {
-                      color: "#0d6efd !important",
-                      bgcolor: "#ebf3ff",
+                      color: "#5b5bd6 !important",
+                      bgcolor: "rgba(91,91,214,0.10)",
                     }
                   }}
                 >
@@ -365,7 +402,7 @@ export function MyPage() {
 
               <Divider />
               
-              <Box sx={{ p: 3 }}>
+              <Box sx={{ p: 2 }}>
                 <Button 
                   fullWidth 
                   variant="outlined" 
@@ -381,17 +418,35 @@ export function MyPage() {
           </Grid>
 
           {/* --- RIGHT CONTENT --- */}
-          <Grid size={{ xs: 12, md: 8, lg: 9 }}>
+          <Grid className="account-content" size={{ xs: 12, md: 8, lg: 9 }}>
             
             {/* 1. ORDERS TAB */}
             {tabValue === "orders" && (
-              <Stack spacing={3}>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>My Orders</Typography>
-                {ordersLoading ? (
-                  <Box sx={{ display: "flex", justifyContent: "center", py: 6 }}>
-                    <CircularProgress sx={{ color: "#0d6efd" }} />
+              <Stack className="account-panel" spacing={2}>
+                <Box className="account-panel-heading">
+                  <Box>
+                    <Typography className="account-panel-kicker">Purchases</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>My Orders</Typography>
                   </Box>
-                ) : myOrders.length === 0 ? (
+                </Box>
+                {ordersError && (
+                  <Alert
+                    className="account-alert"
+                    severity="error"
+                    action={
+                      <Button color="inherit" size="small" startIcon={<RefreshRoundedIcon />} onClick={fetchMyOrders}>
+                        Retry
+                      </Button>
+                    }
+                  >
+                    {ordersError}
+                  </Alert>
+                )}
+                {ordersLoading ? (
+                  <Box className="account-loading-state" sx={{ display: "flex", justifyContent: "center", py: 6 }}>
+                    <CircularProgress sx={{ color: "#5b5bd6" }} />
+                  </Box>
+                ) : ordersError && myOrders.length === 0 ? null : myOrders.length === 0 ? (
                   <Card sx={{ ...fenzoCardStyle, textAlign: "center", py: 8 }}>
                     <Box sx={{ width: 80, height: 80, bgcolor: "#f4f7fb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 3 }}>
                       <LocalMallIcon sx={{ fontSize: 40, color: "#a0b2c6" }} />
@@ -402,8 +457,8 @@ export function MyPage() {
                     </Typography>
                     <Button 
                       variant="contained" 
-                      onClick={() => history.push("/products/ALL")}
-                      sx={{ bgcolor: "#2a5298", color: "white", borderRadius: 2, textTransform: "none", fontWeight: 600, px: 4, py: 1.2, boxShadow: "none" }}
+                      onClick={() => history.push("/products")}
+                      sx={{ bgcolor: "#5b5bd6", color: "white", borderRadius: 2, textTransform: "none", fontWeight: 600, px: 4, py: 1.2, boxShadow: "none" }}
                     >
                       Start Shopping
                     </Button>
@@ -428,9 +483,10 @@ export function MyPage() {
                     </Box>
                     {/* Table header — fixed column widths */}
                     <Box
+                      className="account-order-table-header"
                       sx={{
                         display: "grid",
-                        gridTemplateColumns: "200px 48px 100px 100px 100px 100px 1fr",
+                        gridTemplateColumns: "minmax(220px, 1.45fr) minmax(96px, 0.7fr) minmax(122px, 0.85fr) minmax(106px, 0.75fr) minmax(90px, 0.65fr) minmax(92px, auto)",
                         gap: 2,
                         alignItems: "center",
                         px: 2,
@@ -440,11 +496,10 @@ export function MyPage() {
                       }}
                     >
                       <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5 }}>Product</Typography>
-                      <Box />
                       <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5 }}>Order #</Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5, marginLeft: "20px" }}>Date</Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5, marginLeft: "20px" }}>Status</Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5, marginLeft: "20px" }}>Total</Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5 }}>Date</Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5 }}>Status</Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5 }}>Total</Typography>
                       <Typography variant="caption" sx={{ fontWeight: 700, color: "#666", textTransform: "uppercase", letterSpacing: 0.5, justifySelf: "end" }}>Action</Typography>
                     </Box>
                     {paginatedOrders.map((order) => {
@@ -457,6 +512,7 @@ export function MyPage() {
                       const isExpanded = expandedOrderId === order._id;
                       return (
                         <Card
+                          className={`account-order-card${isExpanded ? " is-expanded" : ""}`}
                           key={order._id}
                           sx={{
                             ...fenzoCardStyle,
@@ -465,10 +521,11 @@ export function MyPage() {
                           }}
                         >
                           <Box
+                            className="account-order-row"
                             onClick={() => setExpandedOrderId((id) => (id === order._id ? null : order._id))}
                             sx={{
                               display: "grid",
-                              gridTemplateColumns: "200px 48px 100px 100px 100px 100px 1fr",
+                              gridTemplateColumns: "minmax(220px, 1.45fr) minmax(96px, 0.7fr) minmax(122px, 0.85fr) minmax(106px, 0.75fr) minmax(90px, 0.65fr) minmax(92px, auto)",
                               gap: 2,
                               alignItems: "center",
                               px: 2,
@@ -477,16 +534,16 @@ export function MyPage() {
                               "&:hover": { bgcolor: "action.hover" },
                             }}
                           >
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+                            <Box className="account-order-products" data-label="Product" sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
                               {items.length > 0 ? (
                                 <>
                                   {visibleItems.map((item) => (
                                     <Box key={item.productId} sx={{ position: "relative", flexShrink: 0 }}>
                                       <img
-                                        src={item.productImage ? `${serverApi}/${item.productImage}` : "/img/placeholder.jpg"}
+                                        src={item.productImage ? `${serverApi}/${item.productImage}` : "/img/product-placeholder.svg"}
                                         alt={item.productName || ""}
                                         style={{ width: 48, height: 48, objectFit: "cover", borderRadius: 8 }}
-                                        onError={(e) => { (e.target as HTMLImageElement).src = "/img/placeholder.jpg"; }}
+                                        onError={(e) => { (e.target as HTMLImageElement).src = "/img/product-placeholder.svg"; }}
                                       />
                                       <Typography
                                         component="span"
@@ -532,18 +589,17 @@ export function MyPage() {
                                 </Box>
                               )}
                             </Box>
-                            <Box />
-                            <Typography variant="body2" sx={{ fontWeight: 600, color: "#333" }}>
+                            <Typography className="account-order-id" data-label="Order #" variant="body2" sx={{ fontWeight: 600, color: "#333" }}>
                               #{orderIdShort}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: "#777", marginLeft: "20px" }}>
+                            <Typography className="account-order-date" data-label="Date" variant="body2" sx={{ color: "#777" }}>
                               {orderDate.toLocaleDateString(undefined, { dateStyle: "medium" })}
                             </Typography>
-                            <Chip label={order.status || "Pending"} size="small" color="primary" variant="outlined" sx={{ fontWeight: 600, height: 22, width: "fit-content", marginLeft: "20px" }} />
-                            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: "#0d6efd", marginLeft: "20px" }}>
+                            <Chip data-label="Status" className={`account-order-status status-${String(order.status || order.orderStatus || "pending").toLowerCase()}`} label={order.status || "Pending"} size="small" color="primary" variant="outlined" sx={{ fontWeight: 600, height: 22, width: "fit-content" }} />
+                            <Typography className="account-order-total" data-label="Total" variant="subtitle2" sx={{ fontWeight: 700, color: "#5b5bd6" }}>
                               ${Number(order.total).toLocaleString()}
                             </Typography>
-                            <Box onClick={(e) => e.stopPropagation()} sx={{ justifySelf: "end", alignSelf: "start" }}>
+                            <Box className="account-order-actions" data-label="Action" onClick={(e) => e.stopPropagation()} sx={{ justifySelf: "end", alignSelf: "start" }}>
                               {(order.status || order.orderStatus || "").toUpperCase() === "PENDING" && (
                                 <Button
                                   size="small"
@@ -556,10 +612,20 @@ export function MyPage() {
                                   {cancellingOrderId === order._id ? "..." : "Cancel"}
                                 </Button>
                               )}
+                              <IconButton
+                                className={`account-expand-button${isExpanded ? " is-expanded" : ""}`}
+                                size="small"
+                                aria-label={isExpanded ? "Collapse order details" : "Expand order details"}
+                                aria-expanded={isExpanded}
+                                onClick={() => setExpandedOrderId((id) => (id === order._id ? null : order._id))}
+                              >
+                                <KeyboardArrowDownRoundedIcon />
+                              </IconButton>
                             </Box>
                           </Box>
                           {isExpanded && items.length > 0 && (
                             <Box
+                              className="account-order-expanded"
                               sx={{
                                 borderTop: "1px solid",
                                 borderColor: "divider",
@@ -585,10 +651,10 @@ export function MyPage() {
                                     }}
                                   >
                                     <img
-                                      src={item.productImage ? `${serverApi}/${item.productImage}` : "/img/placeholder.jpg"}
+                                      src={item.productImage ? `${serverApi}/${item.productImage}` : "/img/product-placeholder.svg"}
                                       alt={item.productName || ""}
                                       style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 10 }}
-                                      onError={(e) => { (e.target as HTMLImageElement).src = "/img/placeholder.jpg"; }}
+                                      onError={(e) => { (e.target as HTMLImageElement).src = "/img/product-placeholder.svg"; }}
                                     />
                                     <Typography variant="caption" sx={{ mt: 0.5, textAlign: "center", fontWeight: 600 }} noWrap title={name}>
                                       {shortName}
@@ -622,8 +688,13 @@ export function MyPage() {
 
             {/* 2. WISHLIST TAB */}
             {tabValue === "wishlist" && (
-              <Stack spacing={3}>
-                <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>My Wishlist</Typography>
+              <Stack className="account-panel" spacing={2}>
+                <Box className="account-panel-heading">
+                  <Box>
+                    <Typography className="account-panel-kicker">Saved for later</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>My Wishlist</Typography>
+                  </Box>
+                </Box>
                 {wishlistItems.length === 0 ? (
                   <Card sx={{ ...fenzoCardStyle, textAlign: "center", py: 8 }}>
                     <Box sx={{ width: 80, height: 80, bgcolor: "#fdf0f0", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 3 }}>
@@ -632,8 +703,8 @@ export function MyPage() {
                     <Typography variant="h6" sx={{ fontWeight: 600, color: "#333", mb: 1 }}>Your wishlist is empty</Typography>
                     <Button 
                       variant="contained" 
-                      onClick={() => history.push("/products/ALL")}
-                      sx={{ bgcolor: "#2a5298", color: "white", borderRadius: 2, mt: 2, textTransform: "none", fontWeight: 600 }}
+                      onClick={() => history.push("/products")}
+                      sx={{ bgcolor: "#5b5bd6", color: "white", borderRadius: 2, mt: 2, textTransform: "none", fontWeight: 600 }}
                     >
                       Discover Products
                     </Button>
@@ -643,19 +714,19 @@ export function MyPage() {
                     {/* Grid qismi: To'liq Grid2 size usuliga o'tkazildi (12 / 4 = 3) */}
                     <Grid container spacing={3}>
                       {currentWishlistItems.map((item) => (
-                        <Grid key={item._id} size={{ xs: 12, sm: 6, md: 3 }}>
-                          <Card sx={{ borderRadius: 3, boxShadow: "0 4px 15px rgba(0,0,0,0.04)", border: "1px solid #eaeaea", position: "relative", height: "100%" }}>
-                            <Box sx={{ position: "relative", overflow: "hidden", borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
-                              <img src={item.image ? `${serverApi}/${item.image}` : "/img/placeholder.jpg"} alt={item.name} style={{ width: "100%", height: 180, objectFit: "cover" }} />
-                              <IconButton sx={{ position: "absolute", top: 10, right: 10, bgcolor: "rgba(255,255,255,0.9)" }} onClick={() => removeFromWishlist(item._id)} size="small">
+                        <Grid key={item._id} size={{ xs: 6, sm: 6, lg: 3 }}>
+                          <Card className="account-wishlist-card" sx={{ borderRadius: 3, boxShadow: "0 4px 15px rgba(0,0,0,0.04)", border: "1px solid #eaeaea", position: "relative", height: "100%" }}>
+                            <Box className="account-wishlist-image" sx={{ position: "relative", overflow: "hidden", borderTopLeftRadius: 12, borderTopRightRadius: 12 }}>
+                              <img src={item.image ? `${serverApi}/${item.image}` : "/img/product-placeholder.svg"} alt={item.name} onError={(event) => { (event.target as HTMLImageElement).src = "/img/product-placeholder.svg"; }} />
+                              <IconButton aria-label={`Remove ${item.name} from wishlist`} sx={{ position: "absolute", top: 10, right: 10, bgcolor: "rgba(255,255,255,0.9)" }} onClick={() => removeFromWishlist(item._id)} size="small">
                                 <DeleteOutlineIcon color="error" fontSize="small" />
                               </IconButton>
                             </Box>
                             <Box sx={{ p: 2 }}>
                               <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "#333" }} noWrap>{item.name}</Typography>
-                              <Typography variant="body1" sx={{ color: "#0d6efd", fontWeight: 700, mt: 0.5 }}>${item.price.toLocaleString()}</Typography>
-                              <Button fullWidth variant="outlined" startIcon={<ShoppingCartIcon />} size="small" sx={{ mt: 1.5, borderRadius: 2, textTransform: "none", fontWeight: 600 }} onClick={() => addToCart({...item, quantity: 1})}>
-                                Add
+                              <Typography variant="body1" sx={{ color: "#5b5bd6", fontWeight: 700, mt: 0.5 }}>${item.price.toLocaleString()}</Typography>
+                              <Button fullWidth variant="outlined" endIcon={<ArrowForwardRoundedIcon />} size="small" sx={{ mt: 1.5, borderRadius: 2, textTransform: "none", fontWeight: 600 }} onClick={() => addToCart({...item, quantity: 1})}>
+                                Add to cart
                               </Button>
                             </Box>
                           </Card>
@@ -681,15 +752,18 @@ export function MyPage() {
 
             {/* 3. PERSONAL INFO TAB */}
             {tabValue === "info" && (
-              <Stack spacing={3}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>Personal Information</Typography>
+              <Stack className="account-panel" spacing={2}>
+                <Box className="account-panel-heading" sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Box>
+                    <Typography className="account-panel-kicker">Profile details</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>Personal Information</Typography>
+                  </Box>
                   {!isEditingInfo && (
                     <Button 
                       variant="contained" 
                       startIcon={<EditIcon />} 
                       onClick={() => setIsEditingInfo(true)}
-                      sx={{ bgcolor: "#2a5298", color: "white", borderRadius: 2, textTransform: "none", boxShadow: "none" }}
+                      sx={{ bgcolor: "#5b5bd6", color: "white", borderRadius: 2, textTransform: "none", boxShadow: "none" }}
                     >
                       Edit Profile
                     </Button>
@@ -734,7 +808,7 @@ export function MyPage() {
                   ) : (
                     /* --- EDIT MODE --- */
                     <Stack spacing={4}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 3, p: 2, bgcolor: "#f9fbfd", borderRadius: 2, border: "1px solid #f0f0f0" }}>
+                      <Box className="account-photo-editor" sx={{ display: "flex", alignItems: "center", gap: 3, p: 2, bgcolor: "#f9fbfd", borderRadius: 2, border: "1px solid #f0f0f0" }}>
                         <Avatar src={avatarSrc} sx={{ width: 70, height: 70, fontSize: 28, boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}>
                           {displayName.charAt(0).toUpperCase()}
                         </Avatar>
@@ -776,11 +850,11 @@ export function MyPage() {
 
                       {infoError && <Typography color="error" sx={{ fontWeight: 500, fontSize: "0.9rem" }}>{infoError}</Typography>}
                       
-                      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, pt: 2 }}>
+                      <Box className="account-form-actions" sx={{ display: "flex", justifyContent: "flex-end", gap: 2, pt: 2 }}>
                         <Button variant="outlined" color="inherit" onClick={cancelEdit} sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600, px: 3 }}>
                           Cancel
                         </Button>
-                        <Button variant="contained" onClick={handleSaveInfo} disabled={infoSaving} sx={{ bgcolor: "#2a5298", color: "white",borderRadius: 2, textTransform: "none", fontWeight: 600, px: 4, boxShadow: "none" }}>
+                        <Button variant="contained" onClick={handleSaveInfo} disabled={infoSaving} sx={{ bgcolor: "#5b5bd6", color: "white",borderRadius: 2, textTransform: "none", fontWeight: 600, px: 4, boxShadow: "none" }}>
                           {infoSaving ? "Saving..." : "Save Changes"}
                         </Button>
                       </Box>
@@ -792,15 +866,18 @@ export function MyPage() {
 
             {/* 4. ADDRESS TAB */}
             {tabValue === "address" && (
-              <Stack spacing={3}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>My Address</Typography>
+              <Stack className="account-panel" spacing={2}>
+                <Box className="account-panel-heading" sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Box>
+                    <Typography className="account-panel-kicker">Delivery</Typography>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: "#333" }}>My Address</Typography>
+                  </Box>
                   {!isEditingAddress && (
                     <Button 
                       variant="contained" 
                       startIcon={<EditIcon />} 
                       onClick={() => setIsEditingAddress(true)}
-                      sx={{ bgcolor: "#2a5298", color: "white", borderRadius: 2, textTransform: "none", boxShadow: "none" }}
+                      sx={{ bgcolor: "#5b5bd6", color: "white", borderRadius: 2, textTransform: "none", boxShadow: "none" }}
                     >
                       {user.userAddress ? "Edit Address" : "Add Address"}
                     </Button>
@@ -810,9 +887,9 @@ export function MyPage() {
                 <Card sx={fenzoCardStyle}>
                   {/* --- VIEW MODE --- */}
                   {!isEditingAddress ? (
-                    <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
+                    <Box className="account-address-card" sx={{ display: "flex", alignItems: "flex-start", gap: 2 }}>
                       <Box sx={{ mt: 0.5, p: 1.5, bgcolor: "#e7f0ff", borderRadius: 2 }}>
-                        <LocationOnIcon sx={{ color: "#0d6efd" }} />
+                        <LocationOnIcon sx={{ color: "#5b5bd6" }} />
                       </Box>
                       <Box sx={{ flex: 1, pt: 0.5 }}>
                         <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#333", mb: 1 }}>
@@ -844,12 +921,18 @@ export function MyPage() {
                         rows={3}
                         sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
                       />
+
+                      {infoError && (
+                        <Alert severity="error" className="account-alert" sx={{ mt: 2 }}>
+                          {infoError}
+                        </Alert>
+                      )}
                       
-                      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}>
+                      <Box className="account-form-actions" sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}>
                         <Button variant="outlined" color="inherit" onClick={cancelEdit} sx={{ borderRadius: 2, textTransform: "none", fontWeight: 600, px: 3 }}>
                           Cancel
                         </Button>
-                        <Button variant="contained" onClick={handleSaveInfo} disabled={infoSaving} sx={{ bgcolor: "#2a5298", color: "white",borderRadius: 2, textTransform: "none", fontWeight: 600, px: 4, boxShadow: "none" }}>
+                        <Button variant="contained" onClick={handleSaveInfo} disabled={infoSaving} sx={{ bgcolor: "#5b5bd6", color: "white",borderRadius: 2, textTransform: "none", fontWeight: 600, px: 4, boxShadow: "none" }}>
                           {infoSaving ? "Saving..." : "Save Address"}
                         </Button>
                       </Box>

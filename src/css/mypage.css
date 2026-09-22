@@ -1,345 +1,834 @@
-/* Asosiy fon va bo'shliqlar */
+.account-auth-loading {
+  min-height: 48vh;
+  display: grid;
+  place-items: center;
+  background: #f5f6fa;
+}
+
 .my-page {
-  padding-top: 40px;
-  padding-bottom: 80px;
-  background-color: #f4f6f8;
+  --account-ink: #101828;
+  --account-muted: #667085;
+  --account-primary: #5b5bd6;
+  --account-primary-hover: #4545bd;
+  --account-primary-soft: rgba(91, 91, 214, 0.1);
+  --account-accent: #f6b94b;
+  --account-canvas: #f5f6fa;
+  --account-line: rgba(16, 24, 40, 0.09);
   min-height: 100vh;
-}
-
-.my-page-title h2 {
-    font-weight: 800;
-    margin-bottom: 30px;
-    color: #1a1a1a;
-}
-
-/* --- SIDEBAR --- */
-.user-sidebar-card {
-    border-radius: 16px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-    overflow: hidden;
-}
-
-.user-avatar-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 30px 20px;
-    background: linear-gradient(180deg, #e3f2fd 0%, #ffffff 50%);
-}
-
-.user-name {
-    margin-top: 15px !important;
-    font-weight: 700 !important;
-}
-
-.user-email {
-    color: #666;
-}
-
-/* Menu Tabs */
-.vertical-tabs .MuiTab-root {
-    justify-content: flex-start !important;
-    text-transform: none !important;
-    font-weight: 500 !important;
-    min-height: 50px !important;
-    padding-left: 24px !important;
-    margin: 4px 12px !important;
-    border-radius: 8px !important;
-    transition: all 0.3s ease;
-}
-
-.vertical-tabs .active-tab {
-    background-color: #e3f2fd !important;
-    color: #1976d2 !important;
-    font-weight: 700 !important;
-}
-
-/* --- ORDER CARD --- */
-.order-card {
-    border-radius: 12px !important;
-    border: 1px solid #e0e0e0 !important;
-    box-shadow: none !important;
-    transition: box-shadow 0.3s ease;
-}
-
-.order-card:hover {
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08) !important;
-}
-
-.order-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background-color: #fafafa;
-}
-
-.order-id {
-    font-weight: 700 !important;
-    color: #333;
-}
-
-/* Order Items List */
-.order-items-box {
-    padding: 20px;
-}
-
-.order-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 12px;
-}
-
-.order-item:last-child {
-    margin-bottom: 0;
-}
-
-.order-item-img {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-    border: 1px solid #eee;
-}
-
-/* Order Footer */
-.order-footer {
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff;
-}
-
-/* -------- Responsive -------- */
-
-@media (max-width: 1024px) {
-  .my-page {
-    padding-top: 24px;
-    padding-bottom: 48px;
-  }
-}
-
-@media (max-width: 768px) {
-  .my-page {
-    padding-top: 16px;
-    padding-bottom: 32px;
-  }
-
-  .order-item {
-    align-items: flex-start;
-  }
-
-  .user-avatar-box {
-    padding: 20px 16px;
-  }
-
-  .vertical-tabs .MuiTab-root {
-    padding-left: 16px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .order-item-img {
-    width: 48px;
-    height: 48px;
-  }
-
-  .my-page-title h2 {
-    font-size: 1.4rem;
-  }
-}
-
-/* --- Luxury account refresh --- */
-.my-page {
-  min-height: 100vh;
-  padding-top: 54px !important;
-  padding-bottom: 86px !important;
+  padding-top: 18px !important;
+  padding-bottom: 56px !important;
   background:
-    radial-gradient(circle at 18% 0%, rgba(214, 184, 122, 0.16), transparent 28%),
-    linear-gradient(180deg, #fbfaf7 0%, #f3eee5 100%) !important;
-  color: #17130d;
+    radial-gradient(circle at 2% 0%, rgba(91, 91, 214, 0.08), transparent 22%),
+    radial-gradient(circle at 98% 9%, rgba(246, 185, 75, 0.07), transparent 18%),
+    var(--account-canvas) !important;
+  color: var(--account-ink);
 }
 
-.my-page > .MuiContainer-root > .MuiTypography-h4 {
-  margin-bottom: 34px !important;
-  padding-bottom: 22px;
-  border-bottom: 1px solid rgba(23, 19, 13, 0.1);
-  color: #17130d !important;
-  font-size: 32px !important;
-  font-weight: 950 !important;
-  letter-spacing: 0 !important;
+.account-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  max-width: none;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1px solid rgba(91, 91, 214, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.045);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.my-page .MuiCard-root {
-  border: 1px solid rgba(23, 19, 13, 0.08) !important;
-  border-radius: 8px !important;
-  background: #fffdf9 !important;
-  box-shadow: 0 18px 45px rgba(23, 19, 13, 0.08) !important;
+.account-eyebrow,
+.account-panel-kicker {
+  margin: 0 0 5px !important;
+  color: var(--account-primary) !important;
+  font-size: 12px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.12em !important;
+  line-height: 1.4 !important;
+  text-transform: uppercase;
 }
 
-.my-page .MuiGrid-root:first-of-type > .MuiCard-root {
+.account-page-header .MuiTypography-h4 {
+  margin: 0 !important;
+  color: var(--account-ink) !important;
+  font-size: clamp(24px, 2.4vw, 32px) !important;
+  font-weight: 850 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.account-header-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.account-header-stats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--account-muted);
+  border: 1px solid rgba(91, 91, 214, 0.12);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.account-header-stats strong {
+  color: var(--account-ink);
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.account-layout {
+  align-items: flex-start;
+}
+
+.account-sidebar {
+  position: sticky;
+  top: 14px;
   overflow: hidden;
+  border: 1px solid var(--account-line) !important;
+  border-radius: 22px !important;
+  background: #fff !important;
+  box-shadow: 0 20px 55px rgba(16, 24, 40, 0.08) !important;
 }
 
-.my-page .MuiAvatar-root {
-  border-color: #fff8ec !important;
-  box-shadow: 0 16px 36px rgba(23, 19, 13, 0.16) !important;
+.account-profile-summary {
+  position: relative;
+  padding: 24px 20px 18px !important;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(246, 185, 75, 0.22), transparent 28%),
+    linear-gradient(180deg, #f0f0ff 0%, #fff 92%) !important;
 }
 
-.my-page .MuiCard-root > .MuiBox-root:first-child {
-  background: #fffdf9 !important;
+.account-main-avatar {
+  width: 82px !important;
+  height: 82px !important;
+  margin: 0 auto 12px !important;
+  border: 5px solid #fff !important;
+  background: var(--account-primary) !important;
+  color: #fff !important;
+  font-size: 30px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 16px 36px rgba(91, 91, 214, 0.23) !important;
 }
 
-.my-page .MuiTypography-h5 {
-  color: #17130d !important;
-  font-size: 25px !important;
-  font-weight: 950 !important;
-  letter-spacing: 0 !important;
+.account-profile-summary .MuiTypography-h6 {
+  color: var(--account-ink) !important;
+  font-size: 18px !important;
+  font-weight: 800 !important;
 }
 
-.my-page .MuiTypography-h6,
-.my-page .MuiTypography-subtitle1,
-.my-page .MuiTypography-subtitle2 {
-  color: #17130d !important;
+.account-profile-summary .MuiTypography-body2 {
+  color: var(--account-muted) !important;
 }
 
-.my-page .MuiTypography-body1,
-.my-page .MuiTypography-body2,
-.my-page .MuiTypography-caption {
-  color: #625746;
+.account-profile-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.account-profile-metrics > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 8px;
+  border: 1px solid rgba(91, 91, 214, 0.11);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.account-profile-metrics strong {
+  color: var(--account-ink);
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.account-profile-metrics span {
+  color: var(--account-muted);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .my-page .MuiDivider-root {
-  border-color: rgba(23, 19, 13, 0.1) !important;
+  border-color: var(--account-line) !important;
 }
 
-.my-page .MuiTabs-root .MuiTab-root {
-  justify-content: flex-start;
-  min-height: 48px !important;
-  margin-bottom: 6px !important;
-  border-radius: 999px !important;
-  color: #625746 !important;
+.account-tabs .MuiTab-root {
+  min-height: 42px !important;
+  justify-content: flex-start !important;
+  margin-bottom: 5px !important;
+  padding: 9px 12px !important;
+  border-radius: 12px !important;
+  color: var(--account-muted) !important;
   font-size: 14px !important;
-  font-weight: 850 !important;
+  font-weight: 750 !important;
   text-transform: none !important;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease !important;
 }
 
-.my-page .MuiTabs-root .MuiTab-root svg {
-  color: #9f7630;
+.account-tabs .MuiTab-root svg {
+  color: #98a2b3;
+  transition: color 0.2s ease;
 }
 
-.my-page .MuiTabs-root .MuiTab-root:hover {
-  background: rgba(214, 184, 122, 0.12) !important;
-  color: #17130d !important;
+.account-tabs .MuiTab-root:hover {
+  background: #f7f7ff !important;
+  color: var(--account-ink) !important;
 }
 
-.my-page .MuiTabs-root .MuiTab-root.Mui-selected {
-  background: #17130d !important;
-  color: #fff8ec !important;
+.account-tabs .MuiTab-root.Mui-selected {
+  background: var(--account-primary-soft) !important;
+  color: var(--account-primary) !important;
 }
 
-.my-page .MuiTabs-root .MuiTab-root.Mui-selected svg {
-  color: #d6b87a;
+.account-tabs .MuiTab-root.Mui-selected svg {
+  color: var(--account-primary) !important;
+}
+
+.account-content {
+  min-width: 0;
+}
+
+.account-panel {
+  min-width: 0;
+}
+
+.account-panel-heading {
+  min-height: 0;
+  display: flex;
+  align-items: center !important;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0;
+}
+
+.account-panel-heading .MuiTypography-h5 {
+  color: var(--account-ink) !important;
+  font-size: clamp(22px, 2vw, 28px) !important;
+  font-weight: 850 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.035em !important;
+}
+
+.my-page .MuiCard-root {
+  border: 1px solid var(--account-line) !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 12px 34px rgba(16, 24, 40, 0.06) !important;
+}
+
+.account-alert {
+  border: 1px solid rgba(217, 45, 32, 0.15) !important;
+  border-radius: 14px !important;
+  background: #fff8f7 !important;
+}
+
+.account-loading-state {
+  min-height: 220px;
+  align-items: center;
+  border: 1px solid var(--account-line);
+  border-radius: 20px;
+  background: #fff;
+}
+
+.account-loading-state .MuiCircularProgress-root {
+  color: var(--account-primary) !important;
 }
 
 .my-page .MuiButton-root {
-  border-radius: 999px !important;
+  min-height: 38px;
+  border-radius: 12px !important;
+  font-weight: 750 !important;
   text-transform: none !important;
-  font-weight: 900 !important;
   box-shadow: none !important;
 }
 
 .my-page .MuiButton-contained {
-  background: #17130d !important;
-  color: #fff8ec !important;
-  border: 1px solid #17130d !important;
+  border: 1px solid var(--account-primary) !important;
+  background: var(--account-primary) !important;
+  color: #fff !important;
 }
 
 .my-page .MuiButton-contained:hover {
-  background: #9f7630 !important;
-  border-color: #9f7630 !important;
+  border-color: var(--account-primary-hover) !important;
+  background: var(--account-primary-hover) !important;
 }
 
 .my-page .MuiButton-outlined {
-  border-color: rgba(23, 19, 13, 0.18) !important;
-  color: #17130d !important;
-  background: #fffdf9 !important;
+  border-color: rgba(91, 91, 214, 0.25) !important;
+  background: #fff !important;
+  color: var(--account-primary) !important;
 }
 
 .my-page .MuiButton-outlined:hover {
-  border-color: rgba(184, 137, 66, 0.58) !important;
-  background: #f7f1e6 !important;
+  border-color: var(--account-primary) !important;
+  background: var(--account-primary-soft) !important;
 }
 
 .my-page .MuiButton-colorError {
-  border-color: rgba(159, 29, 53, 0.36) !important;
-  color: #9f1d35 !important;
+  border-color: rgba(217, 45, 32, 0.24) !important;
+  color: #d92d20 !important;
 }
 
-.my-page .MuiChip-root {
-  border-color: rgba(159, 118, 48, 0.34) !important;
-  color: #9f7630 !important;
-  background: rgba(214, 184, 122, 0.08) !important;
-  font-weight: 900 !important;
+.my-page .MuiButton-colorError:hover {
+  border-color: #d92d20 !important;
+  background: rgba(217, 45, 32, 0.06) !important;
+}
+
+.account-order-table-header,
+.account-order-row {
+  grid-template-columns:
+    minmax(220px, 1.45fr)
+    minmax(96px, 0.7fr)
+    minmax(122px, 0.85fr)
+    minmax(106px, 0.75fr)
+    minmax(90px, 0.65fr)
+    minmax(92px, auto) !important;
+  gap: 12px !important;
+}
+
+.account-order-table-header {
+  padding: 0 18px 11px !important;
+  border-bottom: 0 !important;
+}
+
+.account-order-table-header .MuiTypography-root {
+  min-width: 0;
+  color: #98a2b3 !important;
+  font-size: 10px !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.1em !important;
+  white-space: nowrap;
+}
+
+.account-order-card {
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.account-order-card:hover,
+.account-order-card.is-expanded {
+  border-color: rgba(91, 91, 214, 0.24) !important;
+  box-shadow: 0 18px 44px rgba(16, 24, 40, 0.09) !important;
+}
+
+.account-order-row {
+  min-height: 78px;
+  padding: 14px 18px !important;
+  background: #fff;
+}
+
+.account-order-row:hover {
+  background: #fafaff !important;
+}
+
+.account-order-products img {
+  width: 48px !important;
+  height: 48px !important;
+  border: 1px solid var(--account-line);
+  border-radius: 14px !important;
+}
+
+.account-order-products {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.account-order-id,
+.account-order-date,
+.account-order-total,
+.account-order-status,
+.account-order-actions {
+  min-width: 0;
+  margin-left: 0 !important;
+}
+
+.account-order-id {
+  color: var(--account-ink) !important;
+  font-weight: 800 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-order-date {
+  color: var(--account-muted) !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-order-total {
+  color: var(--account-primary) !important;
+  font-size: 14px !important;
+  font-weight: 850 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-order-status.MuiChip-root {
+  max-width: 100%;
+  height: 26px !important;
+  border-color: rgba(91, 91, 214, 0.22) !important;
+  border-radius: 999px !important;
+  background: var(--account-primary-soft) !important;
+  color: var(--account-primary) !important;
+  font-size: 10px !important;
+  font-weight: 850 !important;
+  text-transform: capitalize;
+}
+
+.account-order-status .MuiChip-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.account-order-status.status-delivered,
+.account-order-status.status-paid {
+  border-color: rgba(18, 183, 106, 0.2) !important;
+  background: rgba(18, 183, 106, 0.09) !important;
+  color: #027a48 !important;
+}
+
+.account-order-status.status-pending,
+.account-order-status.status-processing {
+  border-color: rgba(247, 144, 9, 0.2) !important;
+  background: rgba(247, 144, 9, 0.09) !important;
+  color: #b54708 !important;
+}
+
+.account-order-status.status-cancelled,
+.account-order-status.status-refunded {
+  border-color: rgba(217, 45, 32, 0.18) !important;
+  background: rgba(217, 45, 32, 0.07) !important;
+  color: #b42318 !important;
+}
+
+.account-order-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.account-expand-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--account-line) !important;
+  color: var(--account-muted) !important;
+  transition: transform 0.2s ease, color 0.2s ease, background 0.2s ease !important;
+}
+
+.account-expand-button.is-expanded {
+  transform: rotate(180deg);
+  background: var(--account-primary-soft) !important;
+  color: var(--account-primary) !important;
+}
+
+.account-order-expanded {
+  padding: 20px !important;
+  border-color: var(--account-line) !important;
+  background: #f8f9fc !important;
+}
+
+.account-order-expanded img {
+  border: 1px solid var(--account-line);
+  border-radius: 14px !important;
+}
+
+.account-wishlist-card {
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease !important;
+}
+
+.account-wishlist-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 46px rgba(16, 24, 40, 0.11) !important;
+}
+
+.account-wishlist-image {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 0 !important;
+  background: #f2f4f7;
+}
+
+.account-wishlist-image > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.account-wishlist-card:hover .account-wishlist-image > img {
+  transform: scale(1.035);
+}
+
+.account-wishlist-image .MuiIconButton-root {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--account-line);
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(10px);
+}
+
+.account-wishlist-card .MuiTypography-subtitle2 {
+  color: var(--account-ink) !important;
+  font-size: 14px !important;
+  font-weight: 750 !important;
+}
+
+.account-wishlist-card .MuiTypography-body1 {
+  color: var(--account-primary) !important;
+  font-weight: 850 !important;
+}
+
+.account-photo-editor {
+  flex-wrap: wrap;
+  padding: 20px !important;
+  border-color: var(--account-line) !important;
+  border-radius: 20px !important;
+  background: #f8f9fc !important;
+}
+
+.account-photo-editor .MuiAvatar-root {
+  background: var(--account-primary);
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(91, 91, 214, 0.2) !important;
+}
+
+.account-address-card > .MuiBox-root:first-child {
+  border-radius: 14px !important;
+  background: var(--account-primary-soft) !important;
+}
+
+.account-address-card > .MuiBox-root:first-child svg {
+  color: var(--account-primary) !important;
+}
+
+.account-form-actions {
+  flex-wrap: wrap;
 }
 
 .my-page .MuiInputBase-root,
 .my-page .MuiOutlinedInput-root {
-  border-radius: 8px !important;
-  background: #fffdf9 !important;
+  border-radius: 14px !important;
+  background: #fff !important;
 }
 
 .my-page .MuiOutlinedInput-notchedOutline {
-  border-color: rgba(23, 19, 13, 0.16) !important;
+  border-color: rgba(16, 24, 40, 0.14) !important;
 }
 
-.my-page .Mui-focused .MuiOutlinedInput-notchedOutline,
+.my-page .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(91, 91, 214, 0.42) !important;
+}
+
+.my-page .MuiOutlinedInput-root.Mui-focused {
+  box-shadow: 0 0 0 4px var(--account-primary-soft);
+}
+
 .my-page .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #9f7630 !important;
+  border-width: 1px !important;
+  border-color: var(--account-primary) !important;
 }
 
 .my-page .MuiInputLabel-root.Mui-focused {
-  color: #9f7630 !important;
+  color: var(--account-primary) !important;
+}
+
+.my-page .MuiPaginationItem-root {
+  border-radius: 10px !important;
+  color: var(--account-muted);
 }
 
 .my-page .MuiPaginationItem-root.Mui-selected {
-  background: #17130d !important;
-  color: #fff8ec !important;
+  background: var(--account-primary) !important;
+  color: #fff !important;
 }
 
-.my-page img {
-  border-radius: 8px;
+@media (max-width: 1199px) {
+  .account-order-table-header {
+    display: none !important;
+  }
+
+  .account-order-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-areas:
+      "products products"
+      "id date"
+      "status total"
+      "actions actions";
+    gap: 12px 18px !important;
+    padding: 18px !important;
+  }
+
+  .account-order-products {
+    grid-area: products;
+    padding-bottom: 13px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--account-line);
+  }
+
+  .account-order-id,
+  .account-order-date,
+  .account-order-total {
+    display: grid;
+    gap: 4px;
+  }
+
+  .account-order-id::before,
+  .account-order-date::before,
+  .account-order-total::before,
+  .account-order-status::before,
+  .account-order-actions::before {
+    content: attr(data-label);
+    color: #98a2b3;
+    font-size: 10px;
+    font-weight: 850;
+    letter-spacing: 0.09em;
+    line-height: 1.2;
+    text-transform: uppercase;
+  }
+
+  .account-order-id {
+    grid-area: id;
+  }
+
+  .account-order-date {
+    grid-area: date;
+    justify-self: end;
+  }
+
+  .account-order-status {
+    grid-area: status;
+    align-self: end;
+    display: inline-flex !important;
+    gap: 8px;
+  }
+
+  .account-order-total {
+    grid-area: total;
+    justify-self: end;
+  }
+
+  .account-order-actions {
+    grid-area: actions;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-top: 4px;
+  }
 }
 
-.my-page [style*="color: rgb(13, 110, 253)"],
-.my-page [style*="color:#0d6efd"],
-.my-page [style*="color: #0d6efd"] {
-  color: #9f7630 !important;
-}
-
-.my-page [style*="background-color: rgb(244, 247, 251)"],
-.my-page [style*="background-color:#f4f7fb"],
-.my-page [style*="background-color: #f4f7fb"],
-.my-page [style*="background-color: rgb(231, 240, 255)"],
-.my-page [style*="background-color:#e7f0ff"],
-.my-page [style*="background-color: #e7f0ff"] {
-  background-color: #f5efe3 !important;
-}
-
-@media (max-width: 768px) {
+@media (max-width: 899px) {
   .my-page {
-    padding-top: 34px !important;
-    padding-bottom: 66px !important;
+    padding-top: 18px !important;
+    padding-bottom: 62px !important;
   }
 
-  .my-page > .MuiContainer-root > .MuiTypography-h4 {
-    font-size: 26px !important;
+  .account-page-header {
+    margin-bottom: 16px;
   }
 
-  .my-page .MuiTypography-h5 {
-    font-size: 22px !important;
+  .account-sidebar {
+    position: static;
+  }
+
+  .account-profile-summary {
+    padding: 24px !important;
+  }
+
+  .account-main-avatar {
+    width: 82px !important;
+    height: 82px !important;
+    font-size: 30px !important;
+  }
+
+  .account-profile-metrics {
+    max-width: 300px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .account-tabs {
+    min-height: 54px !important;
+  }
+
+  .account-tabs .MuiTabs-scroller {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+
+  .account-tabs .MuiTabs-flexContainer {
+    flex-direction: row !important;
+    gap: 6px;
+  }
+
+  .account-tabs .MuiTab-root {
+    min-width: max-content !important;
+    margin: 0 !important;
+    padding: 10px 13px !important;
+  }
+
+  .account-sidebar > .MuiBox-root:last-child {
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .my-page {
+    padding-top: 14px !important;
+    padding-bottom: 58px !important;
+  }
+
+  .my-page > .MuiContainer-root {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .account-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .account-page-header .MuiTypography-h4 {
+    font-size: 28px !important;
+  }
+
+  .account-header-stats {
+    justify-content: flex-start;
+  }
+
+  .account-panel-heading {
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 15px;
+  }
+
+  .account-panel-heading > .MuiButton-root {
+    width: 100%;
+  }
+
+  .account-panel-heading .MuiTypography-h5 {
+    font-size: 27px !important;
+  }
+
+  .my-page .MuiCard-root {
+    border-radius: 18px !important;
+  }
+
+  .account-order-row {
+    padding: 15px !important;
+  }
+
+  .account-order-products {
+    overflow-x: auto;
+  }
+
+  .account-order-row {
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "products"
+      "id"
+      "date"
+      "status"
+      "total"
+      "actions";
+  }
+
+  .account-order-status {
+    align-self: stretch;
+    width: fit-content !important;
+  }
+
+  .account-order-date,
+  .account-order-total {
+    justify-self: stretch;
+  }
+
+  .account-order-products img {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .account-order-actions .MuiButton-root {
+    margin-right: auto;
+  }
+
+  .account-order-expanded {
+    padding: 16px !important;
+  }
+
+  .account-order-expanded > .MuiBox-root {
+    gap: 18px !important;
+  }
+
+  .account-wishlist-card > .MuiBox-root:last-child {
+    padding: 12px !important;
+  }
+
+  .account-wishlist-card .MuiButton-root {
+    min-height: 36px;
+    padding-right: 8px;
+    padding-left: 8px;
+    font-size: 11px;
+  }
+
+  .account-wishlist-image .MuiIconButton-root {
+    top: 8px !important;
+    right: 8px !important;
+    width: 32px;
+    height: 32px;
+  }
+
+  .account-photo-editor {
+    align-items: flex-start !important;
+  }
+
+  .account-form-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .account-form-actions .MuiButton-root {
+    width: 100%;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  .account-address-card {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my-page *,
+  .my-page *::before,
+  .my-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }

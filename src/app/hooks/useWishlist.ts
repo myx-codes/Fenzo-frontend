@@ -7,14 +7,19 @@ const productService = new ProductService();
 const WISHLIST_STORAGE_PREFIX = "wishlistData_";
 
 function getStorageKey(userId: string | null): string {
-  return userId ? `${WISHLIST_STORAGE_PREFIX}${userId}` : "";
+  return `${WISHLIST_STORAGE_PREFIX}${userId ?? "guest"}`;
 }
 
 function readWishlistFromStorage(userId: string | null): WishlistItem[] {
-  if (typeof window === "undefined" || !userId) return [];
+  if (typeof window === "undefined") return [];
   const key = getStorageKey(userId);
-  const stored = localStorage.getItem(key);
-  return stored ? JSON.parse(stored) : [];
+  try {
+    const stored = localStorage.getItem(key);
+    const parsed = stored ? JSON.parse(stored) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 export default function useWishlist(userId: string | null) {
@@ -22,14 +27,25 @@ export default function useWishlist(userId: string | null) {
     readWishlistFromStorage(userId)
   );
 
-  // When user signs in/out, load that user's wishlist (or empty for no user)
+  // Keep guest selections and merge them into the signed-in account once.
   useEffect(() => {
-    setWishlistItems(readWishlistFromStorage(userId));
+    let next = readWishlistFromStorage(userId);
+    if (userId) {
+      const guestItems = readWishlistFromStorage(null);
+      if (guestItems.length > 0) {
+        const byId = new Map(next.map((item) => [item._id, item]));
+        guestItems.forEach((item) => byId.set(item._id, item));
+        next = Array.from(byId.values());
+        localStorage.setItem(getStorageKey(userId), JSON.stringify(next));
+        localStorage.removeItem(getStorageKey(null));
+      }
+    }
+    setWishlistItems(next);
   }, [userId]);
 
   const persist = useCallback(
     (items: WishlistItem[]) => {
-      if (!userId || typeof window === "undefined") return;
+      if (typeof window === "undefined") return;
       localStorage.setItem(getStorageKey(userId), JSON.stringify(items));
     },
     [userId]
@@ -37,7 +53,6 @@ export default function useWishlist(userId: string | null) {
 
   const addToWishlist = useCallback(
     (item: WishlistItem) => {
-      if (!userId) return;
       setWishlistItems((prev) => {
         if (prev.some((i) => i._id === item._id)) return prev;
         const next = [...prev, item];
@@ -45,24 +60,22 @@ export default function useWishlist(userId: string | null) {
         return next;
       });
     },
-    [userId, persist]
+    [persist]
   );
 
   const removeFromWishlist = useCallback(
     (id: string) => {
-      if (!userId) return;
       setWishlistItems((prev) => {
         const next = prev.filter((i) => i._id !== id);
         persist(next);
         return next;
       });
     },
-    [userId, persist]
+    [persist]
   );
 
   const toggleWishlist = useCallback(
     (item: WishlistItem) => {
-      if (!userId) return;
       setWishlistItems((prev) => {
         const exists = prev.some((i) => i._id === item._id);
         const next = exists ? prev.filter((i) => i._id !== item._id) : [...prev, item];
@@ -70,7 +83,7 @@ export default function useWishlist(userId: string | null) {
         return next;
       });
     },
-    [userId, persist]
+    [persist]
   );
 
   const isInWishlist = useCallback(

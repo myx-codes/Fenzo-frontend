@@ -20,7 +20,7 @@ export function BasketPage() {
           <Typography color="text.secondary" sx={{ mb: 2 }}>
             Your cart is empty.
           </Typography>
-          <Button variant="contained" onClick={() => history.push("/products/ALL")}>
+          <Button variant="contained" onClick={() => history.push("/products")}>
             Continue shopping
           </Button>
         </Box>
@@ -41,7 +41,7 @@ export function BasketPage() {
                 }}
               >
                 <img
-                  src={item.image ? `${serverApi}/${item.image}` : "/img/placeholder.jpg"}
+                  src={item.image ? `${serverApi}/${item.image}` : "/img/product-placeholder.svg"}
                   alt={item.name}
                   onClick={() => history.push(`/products/detail/${item._id}`)}
                   style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8, cursor: "pointer" }}

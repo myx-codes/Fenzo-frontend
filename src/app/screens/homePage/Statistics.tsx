@@ -1,52 +1,49 @@
 import React from "react";
 import { Container, Box, Typography } from "@mui/material";
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
-import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
+import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
+import BoltOutlinedIcon from "@mui/icons-material/BoltOutlined";
+import TravelExploreOutlinedIcon from "@mui/icons-material/TravelExploreOutlined";
+import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 
-const stats = [
+const benefits = [
   {
-    value: "25K+",
-    label: "Products",
-    desc: "Quality items across all categories",
-    icon: <Inventory2OutlinedIcon />,
+    title: "Trusted stores",
+    desc: "Shop from verified FENZO sellers",
+    icon: <VerifiedUserOutlinedIcon />,
   },
   {
-    value: "12K+",
-    label: "Happy Customers",
-    desc: "Trusted by shoppers every day",
-    icon: <PeopleAltOutlinedIcon />,
+    title: "Fast discovery",
+    desc: "Find the right product without the clutter",
+    icon: <BoltOutlinedIcon />,
   },
   {
-    value: "3K+",
-    label: "Orders Delivered",
-    desc: "Fast & reliable deliveries",
-    icon: <LocalShippingOutlinedIcon />,
+    title: "Curated variety",
+    desc: "Fresh picks across every lifestyle category",
+    icon: <TravelExploreOutlinedIcon />,
   },
   {
-    value: "500+",
-    label: "Verified Sellers",
-    desc: "Authentic & certified stores",
-    icon: <VerifiedOutlinedIcon />,
+    title: "Here to help",
+    desc: "Simple support whenever you need it",
+    icon: <SupportAgentOutlinedIcon />,
   },
 ];
 
 export default function Statistics() {
   return (
-    <div className="stats-section">
+    <section className="stats-section" aria-label="Why shop with FENZO">
       <Container maxWidth="xl">
         <div className="stats-grid">
-          {stats.map((stat, i) => (
-            <Box key={i} className="stat-card">
-              <div className="stat-icon-wrap">{stat.icon}</div>
-              <Typography className="stat-value">{stat.value}</Typography>
-              <Typography className="stat-label">{stat.label}</Typography>
-              <Typography className="stat-desc">{stat.desc}</Typography>
+          {benefits.map((benefit) => (
+            <Box key={benefit.title} className="stat-card">
+              <div className="stat-icon-wrap">{benefit.icon}</div>
+              <div>
+                <Typography className="stat-label">{benefit.title}</Typography>
+                <Typography className="stat-desc">{benefit.desc}</Typography>
+              </div>
             </Box>
           ))}
         </div>
       </Container>
-    </div>
+    </section>
   );
 }

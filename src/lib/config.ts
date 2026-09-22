@@ -1,11 +1,48 @@
 const configuredApiUrl = process.env.REACT_APP_API_URL || "";
+const DEFAULT_DEVELOPMENT_API_PORT = "3002";
+
+function isLoopbackHost(hostname: string): boolean {
+    return ["localhost", "127.0.0.1", "0.0.0.0", "::1", "[::1]"].includes(hostname);
+}
+
+function shouldUseRuntimeLanApi(configuredUrl: string): boolean {
+    if (!configuredUrl.trim()) return true;
+
+    try {
+        const url = new URL(configuredUrl);
+        return isLoopbackHost(url.hostname);
+    } catch (_error) {
+        return false;
+    }
+}
+
+export function resolveApiBaseUrl(
+    environment: string | undefined,
+    runtimeOrigin: string,
+    configuredUrl: string,
+): string {
+    if (environment === "production") return runtimeOrigin;
+    if (!runtimeOrigin || !shouldUseRuntimeLanApi(configuredUrl)) return configuredUrl;
+
+    try {
+        const runtimeUrl = new URL(runtimeOrigin);
+        if (isLoopbackHost(runtimeUrl.hostname)) {
+            return configuredUrl || `http://localhost:${DEFAULT_DEVELOPMENT_API_PORT}`;
+        }
+
+        return `${runtimeUrl.protocol}//${runtimeUrl.hostname}:${DEFAULT_DEVELOPMENT_API_PORT}`;
+    } catch (_error) {
+        return configuredUrl;
+    }
+}
 
 export function getApiBaseUrl(): string {
     if (typeof window !== "undefined") {
-        const host = window.location.hostname;
-        if (host === "fenzo.me" || host === "www.fenzo.me") {
-            return window.location.origin;
-        }
+        return resolveApiBaseUrl(
+            process.env.NODE_ENV,
+            window.location.origin,
+            configuredApiUrl,
+        );
     }
 
     return configuredApiUrl;

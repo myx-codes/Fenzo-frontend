@@ -25,6 +25,9 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import LockRoundedIcon from "@mui/icons-material/LockRounded";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 
 import { useCart } from "../../context/CartContext";
 import { useGlobals } from "../../hooks/useGlobals";
@@ -34,9 +37,10 @@ import { sweetAlert } from "../../../lib/sweetalert";
 import { CartItem } from "../../../lib/types/cart";
 import { CreateOrderInput, BuyNowItem } from "../../../lib/types/order";
 
-
 const steps = ["Cart", "Delivery", "Payment", "Confirm"];
 const orderService = new OrderService();
+const FREE_DELIVERY_THRESHOLD = 100;
+const DELIVERY_FEE = 5;
 
 type CardType = "visa" | "mastercard" | "amex" | "unionpay" | "unknown";
 
@@ -87,22 +91,20 @@ function CheckoutPage() {
 
   const cardType = getCardType(cardNumber);
   const cardNumberRaw = cardNumber.replace(/\D/g, "");
-
   const cardValid =
     cardNumberRaw.length >= 16 &&
     cardExpiry.replace(/\D/g, "").length === 4 &&
     cardCvv.replace(/\D/g, "").length >= 3 &&
     cardName.trim().length >= 2;
 
-  const canGoNextFromPayment =
-    paymentMethod === "delivery" || (paymentMethod === "card" && cardValid);
+  const canGoNextFromPayment = paymentMethod === "delivery" || (paymentMethod === "card" && cardValid);
 
   useEffect(() => {
     if (authUser) {
-      setDelivery((d) => ({
-        ...d,
-        address: d.address || authUser.userAddress || "",
-        phone: d.phone || authUser.userPhone || "",
+      setDelivery((current) => ({
+        ...current,
+        address: current.address || authUser.userAddress || "",
+        phone: current.phone || authUser.userPhone || "",
       }));
     }
   }, [authUser]);
@@ -119,25 +121,23 @@ function CheckoutPage() {
 
   const orderItems = useMemo(() => {
     if (buyNow && !buyNowRemoved) {
-      return [
-        {
-          productId: buyNow.productId,
-          quantity: buyNow.quantity,
-          price: buyNow.price,
-          name: buyNow.name,
-          image: buyNow.image,
-        },
-      ];
+      return [{
+        productId: buyNow.productId,
+        quantity: buyNow.quantity,
+        price: buyNow.price,
+        name: buyNow.name,
+        image: buyNow.image,
+      }];
     }
 
     if (buyNow && buyNowRemoved) return [];
 
-    return cartItems.map((i: CartItem) => ({
-      productId: i._id,
-      quantity: i.quantity,
-      price: i.price,
-      name: i.name,
-      image: i.image,
+    return cartItems.map((item: CartItem) => ({
+      productId: item._id,
+      quantity: item.quantity,
+      price: item.price,
+      name: item.name,
+      image: item.image,
     }));
   }, [buyNow, buyNowRemoved, cartItems]);
 
@@ -153,15 +153,17 @@ function CheckoutPage() {
       return;
     }
 
-    const cartItem = cartItems.find((c) => c._id === item.productId);
+    const cartItem = cartItems.find((cartEntry) => cartEntry._id === item.productId);
     if (cartItem) onDelete(cartItem);
   };
 
   const subtotal = useMemo(
-    () => orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    () => orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [orderItems]
   );
-
+  const deliveryFee = subtotal > 0 && subtotal < FREE_DELIVERY_THRESHOLD ? DELIVERY_FEE : 0;
+  const orderTotal = subtotal + deliveryFee;
+  const freeDeliveryRemaining = Math.max(0, FREE_DELIVERY_THRESHOLD - subtotal);
   const isEmpty = orderItems.length === 0;
 
   const handleNext = () => {
@@ -169,12 +171,12 @@ function CheckoutPage() {
     if (activeStep === 1 && !canGoNextFromDelivery) return;
     if (activeStep === 2 && !canGoNextFromPayment) return;
 
-    setActiveStep((s) => s + 1);
+    setActiveStep((step) => step + 1);
     setError(null);
   };
 
   const handleBack = () => {
-    setActiveStep((s) => s - 1);
+    setActiveStep((step) => step - 1);
     setError(null);
   };
 
@@ -183,10 +185,10 @@ function CheckoutPage() {
     setPlacing(true);
 
     const body: CreateOrderInput = {
-      items: orderItems.map((i) => ({
-        productId: i.productId,
-        quantity: i.quantity,
-        price: i.price,
+      items: orderItems.map((item) => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        price: item.price,
       })),
       note:
         [delivery.address, delivery.city, delivery.zip, delivery.phone, delivery.note]
@@ -208,42 +210,54 @@ function CheckoutPage() {
 
   if (isEmpty) {
     return (
-      <div className="checkout-page">
-        <Container maxWidth="md">
+      <main className="checkout-page checkout-page--empty">
+        <Container maxWidth="sm">
           <Paper elevation={0} className="checkout-empty-card">
-            <Typography className="checkout-empty-title">Your cart is empty.</Typography>
+            <Box className="checkout-empty-icon"><LocalMallIcon /></Box>
+            <Typography component="h1" className="checkout-empty-title">Your cart is empty</Typography>
             <Typography className="checkout-empty-text">
-              Add products to your cart before checkout.
+              Discover something you love, then come back here to complete your order.
             </Typography>
-            <Button className="checkout-primary-btn" onClick={() => history.push("/products/ALL")}>
-              Continue shopping
+            <Button className="checkout-primary-btn" onClick={() => history.push("/products")}>
+              Explore products
             </Button>
           </Paper>
         </Container>
-      </div>
+      </main>
     );
   }
 
   if (authUser === null) {
     return (
       <Box className="checkout-loading">
-        <CircularProgress />
+        <Box className="checkout-loading-icon"><CircularProgress size={30} /></Box>
+        <Typography>Preparing secure checkout…</Typography>
       </Box>
     );
   }
 
   return (
-    <div className="checkout-page">
+    <main className="checkout-page">
       <Container maxWidth="lg" className="checkout-container">
         <Button className="checkout-back-btn" startIcon={<ArrowBackIcon />} onClick={() => history.goBack()}>
-          Back
+          Back to shopping
         </Button>
 
-        <Box className="checkout-header">
-          <Typography className="checkout-kicker">Checkout Orders</Typography>
-        </Box>
+        <header className="checkout-header">
+          <Box>
+            <Typography className="checkout-kicker">Simple · secure · clear</Typography>
+            <Typography component="h1" className="checkout-title">Complete your order</Typography>
+            <Typography className="checkout-subtitle">
+              Review your items, add delivery details and confirm when you are ready.
+            </Typography>
+          </Box>
+          <Box className="checkout-header-note">
+            <LockRoundedIcon />
+            <span>Protected checkout</span>
+          </Box>
+        </header>
 
-        <Stepper activeStep={activeStep} className="checkout-stepper">
+        <Stepper activeStep={activeStep} className="checkout-stepper" alternativeLabel>
           {steps.map((label) => (
             <Step key={label}>
               <StepLabel>{label}</StepLabel>
@@ -251,248 +265,340 @@ function CheckoutPage() {
           ))}
         </Stepper>
 
-        <Paper elevation={0} className="checkout-card">
-          {activeStep === 0 && (
-            <Box>
-              <Typography className="checkout-section-title">
-                <LocalMallIcon /> Review items
-              </Typography>
+        <Box className="checkout-layout">
+          <Paper elevation={0} className="checkout-card checkout-main-card">
+            {activeStep === 0 && (
+              <Box>
+                <Box className="checkout-section-head">
+                  <Box className="checkout-section-icon"><LocalMallIcon /></Box>
+                  <Box>
+                    <Typography className="checkout-section-title">Review items</Typography>
+                    <Typography className="checkout-section-copy">Make sure everything looks right before continuing.</Typography>
+                  </Box>
+                </Box>
 
-              <Box component="ul" className="checkout-items-list">
-                {orderItems.map((item) => (
-                  <Box component="li" key={item.productId} className="checkout-item-row">
-                    <img
-                      src={item.image ? `${serverApi}/${item.image}` : "/img/placeholder.jpg"}
-                      alt={item.name || "Item"}
-                      onClick={() => history.push(`/products/detail/${item.productId}`)}
-                      className="checkout-item-img"
-                    />
+                <Box component="ul" className="checkout-items-list">
+                  {orderItems.map((item) => (
+                    <Box component="li" key={item.productId} className="checkout-item-row">
+                      <img
+                        src={item.image ? `${serverApi}/${item.image}` : "/img/product-placeholder.svg"}
+                        alt={item.name || "Item"}
+                        onClick={() => history.push(`/products/detail/${item.productId}`)}
+                        onError={(event) => {
+                          event.currentTarget.src = "/img/product-placeholder.svg";
+                        }}
+                        className="checkout-item-img"
+                      />
 
-                    <Box className="checkout-item-info">
-                      <Typography className="checkout-item-name">
-                        {item.name || `Product ${item.productId.slice(-6)}`}
+                      <Box className="checkout-item-info">
+                        <Typography className="checkout-item-name">
+                          {item.name || `Product ${item.productId.slice(-6)}`}
+                        </Typography>
+                        <Typography className="checkout-item-meta">
+                          ${item.price.toFixed(2)} × {item.quantity}
+                        </Typography>
+                      </Box>
+
+                      <Typography className="checkout-item-price">
+                        ${(item.price * item.quantity).toFixed(2)}
                       </Typography>
-                      <Typography className="checkout-item-meta">
-                        ${item.price} × {item.quantity}
+
+                      <IconButton
+                        className="checkout-delete-btn"
+                        size="small"
+                        onClick={() => handleRemoveItem(item)}
+                        aria-label={`Remove ${item.name || "item"}`}
+                      >
+                        <DeleteOutlineIcon fontSize="small" />
+                      </IconButton>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            )}
+
+            {activeStep === 1 && (
+              <Box>
+                <Box className="checkout-section-head">
+                  <Box className="checkout-section-icon"><LocalShippingIcon /></Box>
+                  <Box>
+                    <Typography className="checkout-section-title">Delivery details</Typography>
+                    <Typography className="checkout-section-copy">Tell us where this order should arrive.</Typography>
+                  </Box>
+                </Box>
+
+                <Stack spacing={2} className="checkout-form">
+                  <TextField
+                    fullWidth
+                    label="Street address"
+                    value={delivery.address}
+                    onChange={(event) => setDelivery((current) => ({ ...current, address: event.target.value }))}
+                    placeholder="123 Main St"
+                    required
+                  />
+
+                  <Box className="checkout-address-row">
+                    <TextField
+                      fullWidth
+                      label="City (optional)"
+                      value={delivery.city}
+                      onChange={(event) => setDelivery((current) => ({ ...current, city: event.target.value }))}
+                    />
+                    <TextField
+                      fullWidth
+                      label="ZIP code (optional)"
+                      value={delivery.zip}
+                      onChange={(event) => setDelivery((current) => ({ ...current, zip: event.target.value }))}
+                    />
+                  </Box>
+
+                  <TextField
+                    fullWidth
+                    type="tel"
+                    label="Phone"
+                    value={delivery.phone}
+                    onChange={(event) => setDelivery((current) => ({ ...current, phone: event.target.value }))}
+                    placeholder="+1 234 567 8900"
+                  />
+
+                  <TextField
+                    fullWidth
+                    label="Delivery note (optional)"
+                    value={delivery.note}
+                    onChange={(event) => setDelivery((current) => ({ ...current, note: event.target.value }))}
+                    placeholder="Gate code, leave at door, etc."
+                    multiline
+                    rows={3}
+                  />
+                </Stack>
+              </Box>
+            )}
+
+            {activeStep === 2 && (
+              <Box>
+                <Box className="checkout-section-head">
+                  <Box className="checkout-section-icon"><PaymentIcon /></Box>
+                  <Box>
+                    <Typography className="checkout-section-title">Payment method</Typography>
+                    <Typography className="checkout-section-copy">Choose how you would like to complete this order.</Typography>
+                  </Box>
+                </Box>
+
+                <FormControl component="fieldset" fullWidth className="checkout-payment-method">
+                  <RadioGroup
+                    value={paymentMethod}
+                    onChange={(event) => setPaymentMethod(event.target.value as "delivery" | "card")}
+                  >
+                    <FormControlLabel
+                      value="delivery"
+                      control={<Radio />}
+                      label={
+                        <Box className="checkout-payment-label">
+                          <strong>Pay on delivery</strong>
+                          <span>Pay with cash or card when your order arrives.</span>
+                        </Box>
+                      }
+                    />
+                    <FormControlLabel
+                      value="card"
+                      control={<Radio />}
+                      label={
+                        <Box className="checkout-payment-label">
+                          <strong>Card details preview</strong>
+                          <span>Validate card details before placing the order.</span>
+                        </Box>
+                      }
+                    />
+                  </RadioGroup>
+                </FormControl>
+
+                {paymentMethod === "card" && (
+                  <Paper variant="outlined" className="checkout-card-form">
+                    <Box className="checkout-payment-notice">
+                      <InfoOutlinedIcon />
+                      <Typography>
+                        Online charging is not connected yet. These details stay on this screen and are not sent with the order.
                       </Typography>
                     </Box>
 
-                    <Typography className="checkout-item-price">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </Typography>
+                    <Box className="checkout-card-tags">
+                      <Typography>Card preview</Typography>
+                      <Box>
+                        <span>Visa</span><span>MC</span><span>Amex</span><span>UnionPay</span>
+                      </Box>
+                    </Box>
 
-                    <IconButton
-                      className="checkout-delete-btn"
-                      size="small"
-                      onClick={() => handleRemoveItem(item)}
-                      aria-label="Remove"
-                    >
-                      <DeleteOutlineIcon fontSize="small" />
-                    </IconButton>
+                    <Stack spacing={2}>
+                      <TextField
+                        fullWidth
+                        label="Card number"
+                        value={cardNumber}
+                        onChange={(event) => setCardNumber(formatCardNumber(event.target.value))}
+                        placeholder="4242 4242 4242 4242"
+                        inputProps={{ maxLength: 19, inputMode: "numeric" }}
+                        InputProps={{
+                          startAdornment: cardType !== "unknown" && (
+                            <Box component="span" className="checkout-card-type">
+                              {cardType === "visa" ? "Visa" : cardType === "mastercard" ? "MC" : cardType === "amex" ? "Amex" : "UnionPay"}
+                            </Box>
+                          ),
+                        }}
+                      />
+
+                      <Box className="checkout-card-row">
+                        <TextField
+                          label="Expiry (MM/YY)"
+                          value={cardExpiry}
+                          onChange={(event) => setCardExpiry(formatExpiry(event.target.value))}
+                          placeholder="MM/YY"
+                          inputProps={{ maxLength: 5, inputMode: "numeric" }}
+                        />
+                        <TextField
+                          label="CVV"
+                          value={cardCvv}
+                          onChange={(event) => setCardCvv(event.target.value.replace(/\D/g, "").slice(0, 4))}
+                          placeholder={cardType === "amex" ? "4 digits" : "123"}
+                          inputProps={{ maxLength: 4, inputMode: "numeric" }}
+                        />
+                      </Box>
+
+                      <TextField
+                        fullWidth
+                        label="Name on card"
+                        value={cardName}
+                        onChange={(event) => setCardName(event.target.value.slice(0, 40))}
+                        placeholder="John Doe"
+                      />
+                    </Stack>
+                  </Paper>
+                )}
+              </Box>
+            )}
+
+            {activeStep === 3 && (
+              <Box>
+                <Box className="checkout-section-head">
+                  <Box className="checkout-section-icon checkout-section-icon--success"><AssignmentIcon /></Box>
+                  <Box>
+                    <Typography className="checkout-section-title">Ready to order</Typography>
+                    <Typography className="checkout-section-copy">One final check, then your order will be created.</Typography>
                   </Box>
-                ))}
-              </Box>
+                </Box>
 
-              <Divider className="checkout-divider" />
-
-              <Box className="checkout-subtotal-row">
-                <Typography>Total:</Typography>
-                <Typography>${subtotal.toFixed(2)}</Typography>
-              </Box>
-            </Box>
-          )}
-
-          {activeStep === 1 && (
-            <Box>
-              <Typography className="checkout-section-title">
-                <LocalShippingIcon /> Delivery address
-              </Typography>
-
-              <Stack spacing={2} className="checkout-form">
-                <TextField
-                  fullWidth
-                  label="Street address"
-                  value={delivery.address}
-                  onChange={(e) => setDelivery((d) => ({ ...d, address: e.target.value }))}
-                  placeholder="123 Main St"
-                  required
-                />
-
-                <TextField
-                  fullWidth
-                  label="Phone"
-                  value={delivery.phone}
-                  onChange={(e) => setDelivery((d) => ({ ...d, phone: e.target.value }))}
-                  placeholder="+1 234 567 8900"
-                />
-
-                <TextField
-                  fullWidth
-                  label="Delivery note (optional)"
-                  value={delivery.note}
-                  onChange={(e) => setDelivery((d) => ({ ...d, note: e.target.value }))}
-                  placeholder="Gate code, leave at door, etc."
-                  multiline
-                  rows={2}
-                />
-              </Stack>
-            </Box>
-          )}
-
-          {activeStep === 2 && (
-            <Box>
-              <Typography className="checkout-section-title">
-                <PaymentIcon /> Payment method
-              </Typography>
-
-              <FormControl component="fieldset" fullWidth className="checkout-payment-method">
-                <RadioGroup
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value as "delivery" | "card")}
-                >
-                  <FormControlLabel value="delivery" control={<Radio />} label="Pay on delivery (cash or card)" />
-                  <FormControlLabel value="card" control={<Radio />} label="Pay by card (Visa, Mastercard, etc.)" />
-                </RadioGroup>
-              </FormControl>
-
-              {paymentMethod === "card" && (
-                <Paper variant="outlined" className="checkout-card-form">
-                  <Box className="checkout-card-tags">
-                    <Typography>Accepted cards</Typography>
+                <Box className="checkout-confirm-card">
+                  <Box className="checkout-confirm-row">
+                    <Box className="checkout-confirm-icon"><LocalShippingIcon /></Box>
                     <Box>
-                      <span>Visa</span>
-                      <span>MC</span>
-                      <span>Amex</span>
-                      <span>UnionPay</span>
+                      <Typography component="strong">Delivery</Typography>
+                      <Typography>
+                        {[delivery.address, delivery.city, delivery.zip].filter(Boolean).join(", ") || "—"}
+                      </Typography>
                     </Box>
                   </Box>
-
-                  <Stack spacing={2}>
-                    <TextField
-                      fullWidth
-                      label="Card number"
-                      value={cardNumber}
-                      onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                      placeholder="4242 4242 4242 4242"
-                      inputProps={{ maxLength: 19 }}
-                      InputProps={{
-                        startAdornment: cardType !== "unknown" && (
-                          <Box component="span" className="checkout-card-type">
-                            {cardType === "visa"
-                              ? "Visa"
-                              : cardType === "mastercard"
-                              ? "MC"
-                              : cardType === "amex"
-                              ? "Amex"
-                              : "UnionPay"}
-                          </Box>
-                        ),
-                      }}
-                    />
-
-                    <Box className="checkout-card-row">
-                      <TextField
-                        label="Expiry (MM/YY)"
-                        value={cardExpiry}
-                        onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
-                        placeholder="MM/YY"
-                        inputProps={{ maxLength: 5 }}
-                      />
-
-                      <TextField
-                        label="CVV"
-                        value={cardCvv}
-                        onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                        placeholder={cardType === "amex" ? "4 digits" : "123"}
-                        inputProps={{ maxLength: 4 }}
-                      />
+                  <Box className="checkout-confirm-row">
+                    <Box className="checkout-confirm-icon"><PaymentIcon /></Box>
+                    <Box>
+                      <Typography component="strong">Payment</Typography>
+                      <Typography>
+                        {paymentMethod === "delivery"
+                          ? "Pay on delivery"
+                          : `Card preview (${cardType !== "unknown" ? cardType.charAt(0).toUpperCase() + cardType.slice(1) : "Card"} •••• ${cardNumberRaw.slice(-4) || "----"})`}
+                      </Typography>
                     </Box>
+                  </Box>
+                </Box>
 
-                    <TextField
-                      fullWidth
-                      label="Name on card"
-                      value={cardName}
-                      onChange={(e) => setCardName(e.target.value.slice(0, 40))}
-                      placeholder="John Doe"
-                    />
-                  </Stack>
-                </Paper>
+                <Box className="checkout-summary-list checkout-summary-list--confirm">
+                  {orderItems.map((item) => (
+                    <Box key={item.productId} className="checkout-summary-row">
+                      <Typography>{item.name || `Product ${item.productId.slice(-6)}`} × {item.quantity}</Typography>
+                      <Typography>${(item.price * item.quantity).toFixed(2)}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+
+                <Divider className="checkout-divider" />
+                <Box className="checkout-summary-row"><Typography>Subtotal</Typography><Typography>${subtotal.toFixed(2)}</Typography></Box>
+                <Box className="checkout-summary-row"><Typography>Delivery fee</Typography><Typography>{deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}</Typography></Box>
+                <Box className="checkout-total-row"><Typography>Total</Typography><Typography>${orderTotal.toFixed(2)}</Typography></Box>
+
+                {error && <Typography className="checkout-error" role="alert">{error}</Typography>}
+              </Box>
+            )}
+
+            <Box className="checkout-actions">
+              <Button className="checkout-secondary-btn" disabled={activeStep === 0} onClick={handleBack}>
+                Back
+              </Button>
+              <Box className="checkout-spacer" />
+              {activeStep === steps.length - 1 ? (
+                <Button className="checkout-primary-btn" onClick={handlePlaceOrder} disabled={placing}>
+                  {placing ? <CircularProgress size={21} /> : "Place order"}
+                </Button>
+              ) : (
+                <Button
+                  className="checkout-primary-btn"
+                  onClick={handleNext}
+                  disabled={(activeStep === 1 && !canGoNextFromDelivery) || (activeStep === 2 && !canGoNextFromPayment)}
+                >
+                  Continue
+                </Button>
               )}
             </Box>
-          )}
+          </Paper>
 
-          {activeStep === 3 && (
-            <Box>
-              <Typography className="checkout-section-title">
-                <AssignmentIcon /> Order summary
-              </Typography>
-
-              <Box className="checkout-summary-list">
-                {orderItems.map((item) => (
-                  <Box key={item.productId} className="checkout-summary-row">
-                    <Typography>{item.name || `Product ${item.productId.slice(-6)}`} × {item.quantity}</Typography>
-                    <Typography>${(item.price * item.quantity).toFixed(2)}</Typography>
-                  </Box>
-                ))}
+          <Paper component="aside" elevation={0} className="checkout-summary-panel">
+            <Box className="checkout-summary-head">
+              <Box>
+                <Typography className="checkout-summary-eyebrow">Your basket</Typography>
+                <Typography className="checkout-summary-title">Order summary</Typography>
               </Box>
-
-              <Divider className="checkout-divider" />
-
-              <Box className="checkout-summary-row">
-                <Typography>Delivery</Typography>
-                <Typography>
-                  {delivery.address || delivery.city
-                    ? [delivery.address, delivery.city, delivery.zip].filter(Boolean).join(", ") || "—"
-                    : "—"}
-                </Typography>
-              </Box>
-
-              <Box className="checkout-summary-row">
-                <Typography>Payment</Typography>
-                <Typography>
-                  {paymentMethod === "delivery"
-                    ? "Pay on delivery"
-                    : `Card (${cardType !== "unknown" ? cardType.charAt(0).toUpperCase() + cardType.slice(1) : "Card"} •••• ${
-                        cardNumberRaw.slice(-4) || "----"
-                      })`}
-                </Typography>
-              </Box>
-
-              <Divider className="checkout-divider" />
-
-              <Box className="checkout-total-row">
-                <Typography>Total</Typography>
-                <Typography>${subtotal.toFixed(2)}</Typography>
-              </Box>
-
-              {error && <Typography className="checkout-error">{error}</Typography>}
+              <Box className="checkout-summary-count">{orderItems.length}</Box>
             </Box>
-          )}
 
-          <Box className="checkout-actions">
-            <Button className="checkout-secondary-btn" disabled={activeStep === 0} onClick={handleBack}>
-              Back
-            </Button>
+            <Box className="checkout-summary-products">
+              {orderItems.map((item) => (
+                <Box key={`summary-${item.productId}`} className="checkout-summary-product">
+                  <Box className="checkout-summary-img-wrap">
+                    <img
+                      src={item.image ? `${serverApi}/${item.image}` : "/img/product-placeholder.svg"}
+                      alt=""
+                      onError={(event) => {
+                        event.currentTarget.src = "/img/product-placeholder.svg";
+                      }}
+                    />
+                    <span>{item.quantity}</span>
+                  </Box>
+                  <Box className="checkout-summary-product-copy">
+                    <Typography>{item.name || `Product ${item.productId.slice(-6)}`}</Typography>
+                    <small>${item.price.toFixed(2)} each</small>
+                  </Box>
+                  <strong>${(item.price * item.quantity).toFixed(2)}</strong>
+                </Box>
+              ))}
+            </Box>
 
-            <Box className="checkout-spacer" />
+            <Divider className="checkout-divider" />
+            <Box className="checkout-price-lines">
+              <Box><span>Subtotal</span><strong>${subtotal.toFixed(2)}</strong></Box>
+              <Box><span>Delivery</span><strong className={deliveryFee === 0 ? "is-free" : ""}>{deliveryFee === 0 ? "Free" : `$${deliveryFee.toFixed(2)}`}</strong></Box>
+            </Box>
 
-            {activeStep === steps.length - 1 ? (
-              <Button className="checkout-primary-btn" onClick={handlePlaceOrder} disabled={placing}>
-                {placing ? <CircularProgress size={22} /> : "Order"}
-              </Button>
+            {freeDeliveryRemaining > 0 ? (
+              <Box className="checkout-delivery-progress">
+                <Box><span>Add ${freeDeliveryRemaining.toFixed(2)} for free delivery</span><strong>${FREE_DELIVERY_THRESHOLD}</strong></Box>
+                <Box className="checkout-progress-track"><span style={{ width: `${Math.min(100, subtotal)}%` }} /></Box>
+              </Box>
             ) : (
-              <Button
-                className="checkout-primary-btn"
-                onClick={handleNext}
-                disabled={(activeStep === 1 && !canGoNextFromDelivery) || (activeStep === 2 && !canGoNextFromPayment)}
-              >
-                Next
-              </Button>
+              <Box className="checkout-free-delivery"><CheckCircleRoundedIcon /> Free delivery unlocked</Box>
             )}
-          </Box>
-        </Paper>
+
+            <Box className="checkout-summary-total"><span>Total</span><strong>${orderTotal.toFixed(2)}</strong></Box>
+            <Box className="checkout-trust-note"><LockRoundedIcon /><span>Prices are verified by the server when your order is placed.</span></Box>
+          </Paper>
+        </Box>
       </Container>
-    </div>
+    </main>
   );
 }
 

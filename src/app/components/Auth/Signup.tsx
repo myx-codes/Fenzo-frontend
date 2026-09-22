@@ -1,27 +1,27 @@
 import React, { useState } from "react";
 import {
+  Alert,
   Box,
   Button,
-  TextField,
-  Typography,
-  InputAdornment,
-  IconButton,
-  Alert,
   CircularProgress,
-  Container,
+  IconButton,
+  InputAdornment,
+  TextField,
 } from "@mui/material";
 import {
-  PersonOutline as PersonIcon,
-  PhoneOutlined as PhoneIcon,
+  ArrowForwardRounded as ArrowIcon,
+  CheckCircleOutlineRounded as CheckIcon,
+  CheckRounded as BenefitIcon,
   LockOutlined as LockIcon,
+  PersonOutlineRounded as PersonIcon,
+  PhoneOutlined as PhoneIcon,
   Visibility,
   VisibilityOff,
-  ArrowForward as ArrowIcon,
-  CheckCircleOutline as CheckIcon,
 } from "@mui/icons-material";
 import { useHistory } from "react-router-dom";
 import { useGlobals } from "../../hooks/useGlobals";
 import { Messages } from "../../../lib/config";
+import "../../../css/auth.css";
 
 interface StrengthResult {
   score: number;
@@ -29,26 +29,32 @@ interface StrengthResult {
   color: string;
 }
 
-function getStrength(pw: string): StrengthResult {
-  if (!pw) return { score: 0, label: "", color: "#EDE9E3" };
+const signupBenefits = [
+  "A personal shopping space",
+  "Saved products across devices",
+  "Simple and secure checkout",
+];
 
-  let s = 0;
-  if (pw.length >= 6) s++;
-  if (pw.length >= 10) s++;
-  if (/[A-Z]/.test(pw)) s++;
-  if (/[0-9]/.test(pw)) s++;
-  if (/[^A-Za-z0-9]/.test(pw)) s++;
+function getStrength(password: string): StrengthResult {
+  if (!password) return { score: 0, label: "", color: "#e4e7ec" };
 
-  const map: StrengthResult[] = [
-    { score: 0, label: "", color: "#EDE9E3" },
-    { score: 1, label: "Very weak", color: "#EF4444" },
-    { score: 2, label: "Weak", color: "#F59E0B" },
-    { score: 3, label: "Fair", color: "#F59E0B" },
-    { score: 4, label: "Strong", color: "#22C55E" },
-    { score: 5, label: "Very strong", color: "#22C55E" },
+  let score = 0;
+  if (password.length >= 6) score++;
+  if (password.length >= 10) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+
+  const levels: StrengthResult[] = [
+    { score: 0, label: "", color: "#e4e7ec" },
+    { score: 1, label: "Very weak", color: "#d92d20" },
+    { score: 2, label: "Weak", color: "#f79009" },
+    { score: 3, label: "Fair", color: "#f79009" },
+    { score: 4, label: "Strong", color: "#12b76a" },
+    { score: 5, label: "Very strong", color: "#12b76a" },
   ];
 
-  return map[s];
+  return levels[score];
 }
 
 export function Signup() {
@@ -59,17 +65,17 @@ export function Signup() {
   const [userPhone, setUserPhone] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPw, setShowPw] = useState(false);
-  const [showCpw, setShowCpw] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const strength = getStrength(userPassword);
-  const pwMatch = confirmPassword.length > 0 && userPassword === confirmPassword;
-  const pwMismatch = confirmPassword.length > 0 && userPassword !== confirmPassword;
+  const passwordsMatch = confirmPassword.length > 0 && userPassword === confirmPassword;
+  const passwordsMismatch = confirmPassword.length > 0 && userPassword !== confirmPassword;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setError("");
 
     if (!userNick.trim() || !userPhone.trim() || !userPassword) {
@@ -101,485 +107,282 @@ export function Signup() {
     }
   };
 
-  const inputSx = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: "12px",
-      bgcolor: "#FAFAF8",
-      fontSize: "0.95rem",
-      transition: "all 0.2s ease",
-      "& fieldset": { borderColor: "rgba(0,0,0,0.1)" },
-      "&:hover fieldset": { borderColor: "#C8960C" },
-      "&.Mui-focused": {
-        bgcolor: "#FFFFFF",
-        "& fieldset": { borderColor: "#C8960C", borderWidth: "2px" },
-      },
-    },
-    "& .MuiInputBase-input": {
-      py: 1.6,
-      color: "#1C1917",
-      "&::placeholder": { color: "#C4BAB4", opacity: 1 },
-    },
-    "& input:-webkit-autofill": {
-      WebkitBoxShadow: "0 0 0 100px #FAFAF8 inset",
-      WebkitTextFillColor: "#1C1917",
-    },
-  };
-
-  const confirmInputSx = {
-    ...inputSx,
-    "& .MuiOutlinedInput-root": {
-      ...inputSx["& .MuiOutlinedInput-root"],
-      ...(pwMatch && {
-        "& fieldset": { borderColor: "#22C55E", borderWidth: "2px" },
-      }),
-      ...(pwMismatch && {
-        "& fieldset": { borderColor: "#EF4444", borderWidth: "2px" },
-      }),
-    },
-  };
-
-  const labelSx = {
-    fontSize: "0.72rem",
-    fontWeight: 700,
-    color: "#78716C",
-    mb: 0.8,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase" as const,
-  };
-
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        bgcolor: "#FAFAF8",
-        display: "flex",
-        alignItems: "stretch",
-      }}
-    >
-      <Box
-        sx={{
-          display: { xs: "none", md: "flex" },
-          width: { md: "44%", lg: "46%" },
-          flexDirection: "column",
-          justifyContent: "flex-start",
-          alignItems: "flex-start",
-          p: { md: 7, lg: 9 },
-          position: "relative",
-          overflow: "hidden",
-          background:
-            "linear-gradient(145deg, #FDF8F0 0%, #FAF4E8 50%, #F5EDD8 100%)",
-          borderRight: "1px solid rgba(200,150,12,0.12)",
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse at 15% 60%, rgba(200,150,12,0.10) 0%, transparent 55%)," +
-              "radial-gradient(ellipse at 85% 10%, rgba(200,150,12,0.07) 0%, transparent 50%)",
-            pointerEvents: "none",
-          }}
-        />
+    <main className="auth-page">
+      <section className="auth-shell" aria-labelledby="signup-heading">
+        <aside className="auth-story" aria-label="FENZO membership benefits">
+          <div className="auth-brand">
+            <span className="auth-brand-mark" aria-hidden="true">F</span>
+            <span>FENZO</span>
+          </div>
 
-        <Box sx={{ position: "relative" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 5 }}>
-            <Box
-              sx={{
-                width: 42,
-                height: 42,
-                borderRadius: "12px",
-                bgcolor: "#C8960C",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 12px rgba(200,150,12,0.30)",
-              }}
-            >
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 900, fontSize: 20 }}>
-                F
-              </Typography>
-            </Box>
-            <Typography sx={{ color: "#1C1917", fontWeight: 800, fontSize: "1.25rem" }}>
-              Fenzo
-            </Typography>
-          </Box>
+          <div className="auth-story-copy">
+            <p className="auth-eyebrow">Start your journey</p>
+            <h1 className="auth-story-title">
+              Discover more. <span>Shop your way.</span>
+            </h1>
+            <p className="auth-story-description">
+              Create your account and make every visit more personal, from saved
+              finds to effortless order tracking.
+            </p>
+          </div>
 
-          <Typography
-            sx={{
-              color: "#1C1917",
-              fontWeight: 800,
-              fontSize: { md: "1.85rem", lg: "2.1rem" },
-              lineHeight: 1.28,
-              mb: 1.5,
-            }}
-          >
-            Join the{" "}
-            <Box component="span" sx={{ color: "#C8960C" }}>
-              Fenzo family
-            </Box>
-          </Typography>
+          <div className="auth-benefits">
+            {signupBenefits.map((benefit) => (
+              <div className="auth-benefit" key={benefit}>
+                <span className="auth-benefit-icon" aria-hidden="true">
+                  <BenefitIcon sx={{ fontSize: 18 }} />
+                </span>
+                <p>{benefit}</p>
+              </div>
+            ))}
+          </div>
+        </aside>
 
-          <Typography
-            sx={{
-              color: "#78716C",
-              fontSize: "0.95rem",
-              lineHeight: 1.75,
-              mb: 4.5,
-              maxWidth: 300,
-            }}
-          >
-            Create an account in minutes and unlock all the features of our platform.
-          </Typography>
-
-          {[
-            "Quick and easy registration",
-            "Your data is always protected",
-            "Special discounts and offers",
-          ].map((text) => (
-            <Box key={text} sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1.8 }}>
-              <Box
-                sx={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: "8px",
-                  bgcolor: "rgba(200,150,12,0.12)",
-                  border: "1px solid rgba(200,150,12,0.22)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                }}
-              >
-                <Box sx={{ width: 7, height: 7, borderRadius: "50%", bgcolor: "#C8960C" }} />
-              </Box>
-              <Typography sx={{ color: "#78716C", fontSize: "0.9rem", lineHeight: 1.5 }}>
-                {text}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          alignItems: { xs: "flex-start", md: "center" },
-          justifyContent: "center",
-          p: { xs: 2, sm: 4, md: 6 },
-          bgcolor: "#FAFAF8",
-          overflowY: "auto",
-        }}
-      >
-        <Container maxWidth="xs" disableGutters sx={{ width: "100%", maxWidth: "420px !important" }}>
-          <Box
-            sx={{
-              display: { xs: "flex", md: "none" },
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 1.2,
-              mb: 3,
-            }}
-          >
-            <Box
-              sx={{
-                width: 38,
-                height: 38,
-                borderRadius: "10px",
-                bgcolor: "#C8960C",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: "0 4px 12px rgba(200,150,12,0.30)",
-              }}
-            >
-              <Typography sx={{ color: "#FFFFFF", fontWeight: 900, fontSize: 18 }}>
-                F
-              </Typography>
-            </Box>
-            <Typography sx={{ fontWeight: 800, fontSize: "1.25rem", color: "#1C1917" }}>
-              Fenzo
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              bgcolor: "#FFFFFF",
-              borderRadius: "24px",
-              border: "1px solid rgba(200,150,12,0.12)",
-              p: { xs: 3.5, sm: 4.5 },
-              boxShadow:
-                "0 2px 4px rgba(0,0,0,0.02), 0 20px 60px rgba(200,150,12,0.08), 0 8px 24px rgba(0,0,0,0.06)",
-            }}
-          >
-            <Box sx={{ mb: 3.5 }}>
-              <Typography
-                sx={{
-                  fontWeight: 800,
-                  fontSize: "1.75rem",
-                  color: "#1C1917",
-                  lineHeight: 1.15,
-                  mb: 0.7,
-                  fontFamily: "Georgia, 'Times New Roman', serif",
-                  letterSpacing: "-0.025em",
-                }}
-              >
-                {t("signupTitle")}
-              </Typography>
-              <Typography sx={{ color: "#A8A29E", fontSize: "0.875rem", lineHeight: 1.6 }}>
-                Fill in the details below to get started
-              </Typography>
-            </Box>
+        <div className="auth-form-column">
+          <div className="auth-form-wrap">
+            <p className="auth-form-eyebrow">Create an account</p>
+            <h2 className="auth-form-title" id="signup-heading">
+              {t("signupTitle")}
+            </h2>
+            <p className="auth-form-subtitle">
+              Join FENZO in a few moments. All fields marked required must be completed.
+            </p>
 
             {error && (
               <Alert
+                className="auth-alert"
+                id="signup-error"
                 severity="error"
                 onClose={() => setError("")}
-                sx={{
-                  mb: 3,
-                  borderRadius: "12px",
-                  bgcolor: "rgba(220,38,38,0.04)",
-                  border: "1px solid rgba(220,38,38,0.15)",
-                  color: "#DC2626",
-                  fontSize: "0.875rem",
-                  "& .MuiAlert-icon": { color: "#DC2626" },
-                  "& .MuiAlert-action": { pt: 0 },
-                }}
               >
                 {error}
               </Alert>
             )}
 
-            <form onSubmit={handleSubmit} noValidate>
-              <Box sx={{ mb: 2.2 }}>
-                <Typography sx={labelSx}>Username</Typography>
+            <Box className="auth-form" component="form" onSubmit={handleSubmit} noValidate>
+              <div className="auth-field-group">
+                <label className="auth-field-label" htmlFor="signup-username">
+                  {t("username")}
+                </label>
                 <TextField
+                  className="auth-field"
+                  id="signup-username"
                   fullWidth
                   value={userNick}
-                  onChange={(e) => setUserNick(e.target.value)}
+                  onChange={(event) => setUserNick(event.target.value)}
                   placeholder="your_username"
                   required
                   autoComplete="username"
+                  disabled={loading}
+                  inputProps={{
+                    "aria-describedby": error ? "signup-error" : undefined,
+                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <PersonIcon sx={{ color: "#C4BAB4", fontSize: 19 }} />
+                        <PersonIcon sx={{ fontSize: 20 }} aria-hidden="true" />
                       </InputAdornment>
                     ),
                   }}
-                  sx={inputSx}
                 />
-              </Box>
+              </div>
 
-              <Box sx={{ mb: 2.2 }}>
-                <Typography sx={labelSx}>Phone Number</Typography>
+              <div className="auth-field-group">
+                <label className="auth-field-label" htmlFor="signup-phone">
+                  {t("phone")}
+                </label>
                 <TextField
+                  className="auth-field"
+                  id="signup-phone"
                   fullWidth
                   value={userPhone}
-                  onChange={(e) => setUserPhone(e.target.value)}
+                  onChange={(event) => setUserPhone(event.target.value)}
                   placeholder="+998 90 123 45 67"
                   required
                   autoComplete="tel"
-                  inputProps={{ inputMode: "tel" }}
+                  disabled={loading}
+                  inputProps={{
+                    inputMode: "tel",
+                    "aria-describedby": error ? "signup-error" : undefined,
+                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <PhoneIcon sx={{ color: "#C4BAB4", fontSize: 19 }} />
+                        <PhoneIcon sx={{ fontSize: 20 }} aria-hidden="true" />
                       </InputAdornment>
                     ),
                   }}
-                  sx={inputSx}
                 />
-              </Box>
+              </div>
 
-              <Box sx={{ mb: 2.2 }}>
-                <Typography sx={labelSx}>Password</Typography>
+              <div className="auth-field-group">
+                <label className="auth-field-label" htmlFor="signup-password">
+                  {t("password")}
+                </label>
                 <TextField
+                  className="auth-field"
+                  id="signup-password"
                   fullWidth
-                  type={showPw ? "text" : "password"}
+                  type={showPassword ? "text" : "password"}
                   value={userPassword}
-                  onChange={(e) => setUserPassword(e.target.value)}
+                  onChange={(event) => setUserPassword(event.target.value)}
                   placeholder="••••••••"
                   required
                   autoComplete="new-password"
+                  disabled={loading}
+                  inputProps={{ "aria-describedby": "password-strength signup-error" }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockIcon sx={{ color: "#C4BAB4", fontSize: 19 }} />
+                        <LockIcon sx={{ fontSize: 20 }} aria-hidden="true" />
                       </InputAdornment>
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          onClick={() => setShowPw((p) => !p)}
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          aria-pressed={showPassword}
+                          onClick={() => setShowPassword((visible) => !visible)}
                           edge="end"
                           size="small"
-                          sx={{ color: "#C4BAB4", "&:hover": { color: "#C8960C" } }}
+                          disabled={loading}
                         >
-                          {showPw ? (
-                            <VisibilityOff sx={{ fontSize: 18 }} />
+                          {showPassword ? (
+                            <VisibilityOff sx={{ fontSize: 19 }} />
                           ) : (
-                            <Visibility sx={{ fontSize: 18 }} />
+                            <Visibility sx={{ fontSize: 19 }} />
                           )}
                         </IconButton>
                       </InputAdornment>
                     ),
                   }}
-                  sx={inputSx}
                 />
 
                 {userPassword && (
-                  <Box sx={{ mt: 1 }}>
-                    <Box sx={{ display: "flex", gap: 0.5, mb: 0.4 }}>
-                      {[1, 2, 3, 4, 5].map((seg) => (
-                        <Box
-                          key={seg}
-                          sx={{
-                            flex: 1,
-                            height: 3,
-                            borderRadius: 2,
-                            bgcolor: strength.score >= seg ? strength.color : "#EDE9E3",
-                            transition: "background-color 0.3s ease",
+                  <div
+                    className="auth-strength"
+                    id="password-strength"
+                    role="progressbar"
+                    aria-label="Password strength"
+                    aria-valuemin={0}
+                    aria-valuemax={5}
+                    aria-valuenow={strength.score}
+                    aria-valuetext={strength.label}
+                  >
+                    <div className="auth-strength-track" aria-hidden="true">
+                      {[1, 2, 3, 4, 5].map((segment) => (
+                        <span
+                          className="auth-strength-segment"
+                          key={segment}
+                          style={{
+                            backgroundColor:
+                              strength.score >= segment ? strength.color : undefined,
                           }}
                         />
                       ))}
-                    </Box>
-                    <Typography sx={{ fontSize: "0.72rem", fontWeight: 600, color: strength.color }}>
+                    </div>
+                    <p className="auth-strength-label" style={{ color: strength.color }}>
                       {strength.label}
-                    </Typography>
-                  </Box>
+                    </p>
+                  </div>
                 )}
-              </Box>
+              </div>
 
-              <Box sx={{ mb: 3.5 }}>
-                <Typography sx={labelSx}>Confirm Password</Typography>
+              <div className="auth-field-group">
+                <label className="auth-field-label" htmlFor="signup-confirm-password">
+                  {t("confirmPassword")}
+                </label>
                 <TextField
+                  className={`auth-field${passwordsMatch ? " auth-field-success" : ""}`}
+                  id="signup-confirm-password"
                   fullWidth
-                  type={showCpw ? "text" : "password"}
+                  type={showConfirmation ? "text" : "password"}
                   value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
                   placeholder="••••••••"
                   required
                   autoComplete="new-password"
+                  disabled={loading}
+                  error={passwordsMismatch}
+                  inputProps={{
+                    "aria-describedby": passwordsMismatch
+                      ? "password-mismatch signup-error"
+                      : "signup-error",
+                  }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockIcon sx={{ color: "#C4BAB4", fontSize: 19 }} />
+                        <LockIcon sx={{ fontSize: 20 }} aria-hidden="true" />
                       </InputAdornment>
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
-                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.3 }}>
-                          {pwMatch && <CheckIcon sx={{ fontSize: 17, color: "#22C55E" }} />}
-                          <IconButton
-                            onClick={() => setShowCpw((p) => !p)}
-                            edge="end"
-                            size="small"
-                            sx={{ color: "#C4BAB4", "&:hover": { color: "#C8960C" } }}
-                          >
-                            {showCpw ? (
-                              <VisibilityOff sx={{ fontSize: 18 }} />
-                            ) : (
-                              <Visibility sx={{ fontSize: 18 }} />
-                            )}
-                          </IconButton>
-                        </Box>
+                        {passwordsMatch && (
+                          <CheckIcon sx={{ mr: 0.4, color: "#12b76a", fontSize: 19 }} />
+                        )}
+                        <IconButton
+                          aria-label={showConfirmation ? "Hide password confirmation" : "Show password confirmation"}
+                          aria-pressed={showConfirmation}
+                          onClick={() => setShowConfirmation((visible) => !visible)}
+                          edge="end"
+                          size="small"
+                          disabled={loading}
+                        >
+                          {showConfirmation ? (
+                            <VisibilityOff sx={{ fontSize: 19 }} />
+                          ) : (
+                            <Visibility sx={{ fontSize: 19 }} />
+                          )}
+                        </IconButton>
                       </InputAdornment>
                     ),
                   }}
-                  sx={confirmInputSx}
                 />
-                {pwMismatch && (
-                  <Typography sx={{ fontSize: "0.72rem", color: "#EF4444", fontWeight: 500, mt: 0.5 }}>
-                    Passwords do not match
-                  </Typography>
+                {passwordsMismatch && (
+                  <p className="auth-field-message" id="password-mismatch" role="alert">
+                    {Messages.errorPasswordMatch}
+                  </p>
                 )}
-              </Box>
+              </div>
 
               <Button
+                className="auth-submit"
                 type="submit"
                 fullWidth
                 variant="contained"
                 disabled={loading}
-                endIcon={!loading && <ArrowIcon sx={{ fontSize: "17px !important" }} />}
-                sx={{
-                  background: "linear-gradient(135deg, #C8960C 0%, #A67C0A 100%)",
-                  color: "#FFFFFF",
-                  minHeight: 52,
-                  textTransform: "none",
-                  fontWeight: 700,
-                  fontSize: "0.95rem",
-                  borderRadius: "12px",
-                  boxShadow: "0 4px 20px rgba(200,150,12,0.35)",
-                  "&:hover": {
-                    background: "linear-gradient(135deg, #D9A212, #C8960C)",
-                    boxShadow: "0 6px 28px rgba(200,150,12,0.45)",
-                    transform: "translateY(-1px)",
-                  },
-                  "&:active": { transform: "translateY(0)" },
-                  "&:disabled": {
-                    bgcolor: "#EDE9E3",
-                    color: "#B8AFA8",
-                    boxShadow: "none",
-                    background: "none",
-                  },
-                  transition: "all 0.2s ease",
-                  mb: 2,
-                }}
+                endIcon={!loading ? <ArrowIcon /> : undefined}
               >
                 {loading ? (
-                  <CircularProgress size={20} sx={{ color: "#B8AFA8" }} />
+                  <>
+                    <CircularProgress size={19} color="inherit" sx={{ mr: 1 }} />
+                    {t("creatingAccount")}
+                  </>
                 ) : (
-                  "Create Account"
+                  t("signUp")
                 )}
               </Button>
 
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2, my: 2.5 }}>
-                <Box sx={{ flex: 1, height: "1px", bgcolor: "rgba(0,0,0,0.07)" }} />
-                <Typography sx={{ color: "#C4BAB4", fontSize: "0.72rem", letterSpacing: "0.08em" }}>
-                  OR
-                </Typography>
-                <Box sx={{ flex: 1, height: "1px", bgcolor: "rgba(0,0,0,0.07)" }} />
-              </Box>
-
-              <Button
-                fullWidth
-                variant="outlined"
-                onClick={() => history.push("/login")}
-                sx={{
-                  minHeight: 50,
-                  textTransform: "none",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  borderRadius: "12px",
-                  borderColor: "rgba(0,0,0,0.1)",
-                  color: "#78716C",
-                  bgcolor: "#FAFAF8",
-                  "&:hover": {
-                    borderColor: "#C8960C",
-                    bgcolor: "rgba(200,150,12,0.04)",
-                    color: "#1C1917",
-                  },
-                  transition: "all 0.2s ease",
-                }}
-              >
-                Already have an account?{" "}
-                <Box component="span" sx={{ color: "#C8960C", fontWeight: 700, ml: 0.5 }}>
-                  Sign In
-                </Box>
-              </Button>
-            </form>
-          </Box>
-
-          <Typography sx={{ textAlign: "center", mt: 3, fontSize: "0.75rem", color: "#C4BAB4" }}>
-            By creating an account you agree to our{" "}
-            <Box component="span" sx={{ color: "#C8960C", cursor: "pointer", "&:hover": { textDecoration: "underline" } }}>
-              Terms of Service
+              <div className="auth-switch">
+                <span className="auth-switch-text">Already have an account?</span>{" "}
+                <Button
+                  className="auth-switch-button"
+                  type="button"
+                  onClick={() => history.push("/login")}
+                  disabled={loading}
+                >
+                  {t("login")}
+                </Button>
+              </div>
             </Box>
-          </Typography>
-        </Container>
-      </Box>
-    </Box>
+
+            <p className="auth-legal">
+              By creating an account, you agree to FENZO&apos;s terms and privacy policy.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }

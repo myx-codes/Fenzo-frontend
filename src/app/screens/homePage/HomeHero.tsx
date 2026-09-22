@@ -1,78 +1,87 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, Button, Typography } from "@mui/material";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import { useHistory } from "react-router-dom";
-import { useGlobals } from "../../hooks/useGlobals";
-
-const heroSlides = [
-  {
-    id: 2,
-    eyebrow: "Limited Season Edit",
-    title: "Big Sales ",
-    subtitle: "Explore fashion, electronics, beauty, and lifestyle collections with elevated savings.",
-    btnKey: "explore",
-    image: "/img/sale.jpg",
-    path: "/products/FASHION",
-  },
-] as const;
 
 export default function HomeHero() {
-  const { t } = useGlobals();
   const history = useHistory();
-  const [activeSlide, setActiveSlide] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const slide = heroSlides[activeSlide];
 
   return (
-    <div className="home-hero carousel-container">
-      <Box
-        className="hero-carousel"
-        sx={{
-          backgroundImage: `url(${slide.image})`,
-        }}
-      >
-        <Box className="hero-content-wrapper">
-          <Typography component="div" className="hero-kicker">
-            {slide.eyebrow}
+    <section className="home-hero" aria-labelledby="home-hero-title">
+      <div className="hero-shell">
+        <Box className="hero-copy">
+          <div className="hero-kicker">
+            <AutoAwesomeRoundedIcon />
+            FENZO market
+          </div>
+
+          <Typography component="h1" id="home-hero-title" className="hero-title">
+            Curated products,
+            <span> easy shopping.</span>
           </Typography>
 
-          <Typography variant="h1" className="hero-title">
-            {slide.title}
-          </Typography>
-
-          <Typography component="div" className="hero-subtitle">
-            {slide.subtitle}
+          <Typography component="p" className="hero-subtitle">
+            Search fast, compare clearly, and shop trusted sellers across
+            fashion, electronics, beauty, health, kids, and daily essentials.
           </Typography>
 
           <Box className="hero-actions">
             <Button
-              variant="contained"
               className="hero-btn"
               endIcon={<ArrowForwardRoundedIcon />}
-              onClick={() => history.push(slide.path)}
+              onClick={() => history.push("/products/FASHION")}
             >
-              {t(slide.btnKey)}
+              Shop fashion
             </Button>
-            <Button variant="outlined" className="hero-btn-secondary" onClick={() => history.push("/products/ALL")}>
-              View Catalog
+            <Button
+              className="hero-btn-secondary"
+              onClick={() => history.push("/products/FASHION")}
+            >
+              Fashion
             </Button>
           </Box>
 
-          <Box className="hero-metrics" aria-label="Marketplace highlights">
-            <span>Verified sellers</span>
-            <span>Fast checkout</span>
-            <span>Premium brands</span>
-          </Box>
+          <div className="hero-proof" aria-label="Shopping benefits">
+            <span><CheckCircleRoundedIcon /> Fast local delivery</span>
+            <span><CheckCircleRoundedIcon /> Secure checkout</span>
+            <span><CheckCircleRoundedIcon /> Real shopper reviews</span>
+          </div>
         </Box>
-      </Box>
-    </div>
+
+        <div className="hero-visual" aria-label="Season sale collection">
+          <div className="hero-visual-main">
+            <img src="/img/sale.jpg" alt="Season sale shopping bags" />
+            <div className="hero-visual-gradient" />
+            <div className="hero-sale-badge">
+              <span>Season edit</span>
+              <strong>Up to 70% off</strong>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="hero-floating-card hero-floating-card--top"
+            onClick={() => history.push("/products/ELECTRONICS")}
+          >
+            <img src="/img/bannerImage.jpg" alt="Electronics collection" />
+            <span>
+              <small>Daily deal</small>
+              Smart essentials
+            </span>
+            <ArrowForwardRoundedIcon />
+          </button>
+
+          <div className="hero-floating-card hero-floating-card--bottom">
+            <span className="hero-rating">4.9</span>
+            <span>
+              <strong>Trusted market</strong>
+              <small>Clear prices, quick checkout</small>
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

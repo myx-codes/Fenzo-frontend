@@ -12,7 +12,6 @@ import { createSelector } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
 import { retrieveBestProducts } from "./selector";
 import { Product } from "../../../lib/types/product";
-import { CartItem } from "../../../lib/types/cart";
 import { WishlistItem } from "../../../lib/types/wishlist";
 import { serverApi } from "../../../lib/config";
 import { useCart } from "../../context/CartContext";
@@ -37,27 +36,27 @@ export function BestProducts() {
       <Container maxWidth="xl">
         <div className="lp-section-head">
           <div>
-            <Typography className="lp-section-title">Popular Products</Typography>
+            <span className="lp-section-eyebrow">Trending on FENZO</span>
+            <Typography className="lp-section-title">Popular right now</Typography>
+            <Typography className="lp-section-sub">
+              Most-viewed products shoppers keep coming back to.
+            </Typography>
           </div>
-          <Button
-            className="lp-see-all-btn"
-            onClick={() => history.push("/products/ALL")}
-          >
-            See all →
-          </Button>
         </div>
 
         <div className="pp-grid">
-          {products.map((product: Product) => {
+          {products.slice(0, 8).map((product: Product) => {
             const img = product.productImages?.[0]
               ? `${serverApi}/${product.productImages[0]}`
-              : "/img/placeholder.jpg";
+              : "/img/product-placeholder.svg";
 
-            const wished     = isInWishlist(product._id);
-            const ratingVal  = Number(product.productViews || 0);
-            const safeRating = Math.min(ratingVal / 20, 5);
-            const reviews    = ratingVal > 10 ? Math.floor(ratingVal / 10) : 0;
-            const collLabel  = String(product.productCollection ?? "")
+            const wished = isInWishlist(product._id);
+            const ratingVal = Number(product.productRating ?? 0);
+            const safeRating = Number.isFinite(ratingVal)
+              ? Math.min(Math.max(ratingVal, 0), 5)
+              : 0;
+            const inStock = Number(product.productStock ?? 0) > 0;
+            const collLabel = String(product.productCollection ?? "")
               .replace(/-/g, " ");
 
             return (
@@ -65,6 +64,14 @@ export function BestProducts() {
                 key={product._id}
                 className="pp-card"
                 onClick={() => history.push(`/products/detail/${product._id}`)}
+                role="link"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    history.push(`/products/detail/${product._id}`);
+                  }
+                }}
               >
                 <Box className="pp-card-img-wrap">
                   <img
@@ -72,31 +79,15 @@ export function BestProducts() {
                     alt={product.productName}
                     className="pp-card-img"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/img/placeholder.jpg";
+                      (e.target as HTMLImageElement).src = "/img/product-placeholder.svg";
                     }}
                   />
 
-                  <Box className="pp-card-overlay">
-                    <Button
-                      className="pp-card-quick-add"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart({
-                          _id: product._id,
-                          name: product.productName,
-                          price: product.productPrice,
-                          quantity: 1,
-                          image: product.productImages?.[0] ?? "",
-                          collection: String(product.productCollection),
-                        });
-                      }}
-                    >
-                      Quick Add
-                    </Button>
-                  </Box>
-
                   <IconButton
                     className={`pp-card-wish ${wished ? "active" : ""}`}
+                    aria-label={wished
+                      ? `Remove ${product.productName} from wishlist`
+                      : `Add ${product.productName} to wishlist`}
                     onClick={(e) => {
                       e.stopPropagation();
                       const item: WishlistItem = {
@@ -108,6 +99,7 @@ export function BestProducts() {
                       };
                       toggleWishlist(item);
                     }}
+                    onKeyDown={(e) => e.stopPropagation()}
                   >
                     {wished
                       ? <FavoriteIcon sx={{ fontSize: 16 }} />
@@ -136,7 +128,7 @@ export function BestProducts() {
                       emptyIcon={<StarIcon sx={{ fontSize: 13, opacity: 0.2 }} />}
                     />
                     <Typography className="pp-card-review-count">
-                      ({reviews})
+                      ({safeRating.toFixed(1)})
                     </Typography>
                     <Box className="pp-card-views">
                       <VisibilityIcon sx={{ fontSize: 12 }} />
@@ -152,10 +144,15 @@ export function BestProducts() {
                     <Box
                       className="pp-card-actions"
                       onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
                     >
-                      <Tooltip title="Add to cart">
+                      <Tooltip title={inStock ? "Add to cart" : "Sold out"}>
                         <IconButton
                           className="pp-card-cart-btn"
+                          aria-label={inStock
+                            ? `Add ${product.productName} to cart`
+                            : `${product.productName} is sold out`}
+                          disabled={!inStock}
                           onClick={() =>
                             addToCart({
                               _id: product._id,
@@ -173,10 +170,10 @@ export function BestProducts() {
 
                       <Button
                         className="pp-card-buy-btn"
-                        disabled={buyNowLoading}
+                        disabled={buyNowLoading || !inStock}
                         onClick={() => handleBuyNow(product, 1)}
                       >
-                        Buy Now
+                        {inStock ? "Buy Now" : "Sold out"}
                       </Button>
                     </Box>
                   </Box>

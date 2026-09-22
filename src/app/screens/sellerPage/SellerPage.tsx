@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   Container, Typography, Avatar, Box, Button,
-  Rating, CircularProgress, Divider, IconButton, Tooltip, Chip,
+  Rating, CircularProgress, IconButton, Tooltip, Chip,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import { useParams, useHistory } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import StorefrontIcon from "@mui/icons-material/Storefront";
@@ -15,14 +14,12 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import VerifiedIcon from "@mui/icons-material/Verified";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import StarIcon from "@mui/icons-material/Star";
 
 import UserService from "../../services/UserService";
 import { SellerProfile } from "../../../lib/types/seller";
 import { serverApi } from "../../../lib/config";
-import { CartItem } from "../../../lib/types/cart";
 import { WishlistItem } from "../../../lib/types/wishlist";
 import { useCart } from "../../context/CartContext";
 import { useWishlistContext } from "../../context/WishlistContext";
@@ -74,7 +71,7 @@ export function SellerPage() {
   if (loading) {
     return (
       <Box className="sp-loading">
-        <CircularProgress size={44} thickness={3} sx={{ color: "var(--gold)" }} />
+        <CircularProgress size={44} thickness={3} sx={{ color: "var(--fz-brand)" }} />
         <Typography className="sp-loading-text">Loading seller…</Typography>
       </Box>
     );
@@ -88,8 +85,8 @@ export function SellerPage() {
         <Typography className="sp-error-sub">
           {error || "This seller profile doesn't exist or has been removed."}
         </Typography>
-        <Button className="sp-error-btn" onClick={() => history.push("/")}>
-          Back to Home
+        <Button className="sp-error-btn" onClick={() => history.push("/products")}>
+          Explore products
         </Button>
       </Box>
     );
@@ -103,21 +100,30 @@ export function SellerPage() {
     const imgPath =
       product.productImages?.length
         ? `${serverApi}/${product.productImages[0]}`
-        : "/img/placeholder.jpg";
+        : "/img/product-placeholder.svg";
 
-    const rawViews =
-      product.productViews ?? product.views ?? product.viewsCount ?? 0;
-    const views      = Number(rawViews) || 0;
+    const rawViews = product.productViews ?? product.views ?? product.viewsCount ?? 0;
+    const views = Number(rawViews) || 0;
     const wished     = isInWishlist(product._id);
-    const safeRating = Math.min(views / 20, 5);
-    const reviews    = views > 10 ? Math.floor(views / 10) : 0;
+    const safeRating = Number(product.productRating ?? 0);
     const collLabel  = String(product.productCollection ?? "").replace(/-/g, " ");
+    const inStock = Number(product.productStock ?? 0) > 0;
 
     return (
       <Box
         key={product._id}
         className="pp-card"
         onClick={() => history.push(`/products/detail/${product._id}`)}
+        onKeyDown={(event) => {
+          if (event.target !== event.currentTarget) return;
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            history.push(`/products/detail/${product._id}`);
+          }
+        }}
+        role="link"
+        tabIndex={0}
+        aria-label={`View ${product.productName}`}
       >
         {/* Image */}
         <Box className="pp-card-img-wrap">
@@ -126,33 +132,15 @@ export function SellerPage() {
             alt={product.productName}
             className="pp-card-img"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = "/img/placeholder.jpg";
+              (e.target as HTMLImageElement).onerror = null;
+              (e.target as HTMLImageElement).src = "/img/product-placeholder.svg";
             }}
           />
-
-          {/* Quick-add overlay */}
-          <Box className="pp-card-overlay">
-            <Button
-              className="pp-card-quick-add"
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart({
-                  _id: product._id,
-                  name: product.productName,
-                  price: product.productPrice,
-                  quantity: 1,
-                  image: product.productImages?.[0] ?? "",
-                  collection: String(product.productCollection),
-                });
-              }}
-            >
-              Quick Add
-            </Button>
-          </Box>
 
           {/* Wishlist */}
           <IconButton
             className={`pp-card-wish ${wished ? "active" : ""}`}
+            aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
             onClick={(e) => {
               e.stopPropagation();
               const item: WishlistItem = {
@@ -187,10 +175,12 @@ export function SellerPage() {
               precision={0.5}
               readOnly
               size="small"
-              icon={<StarIcon sx={{ fontSize: 13, color: "var(--gold)" }} />}
+              icon={<StarIcon sx={{ fontSize: 13, color: "var(--fz-accent)" }} />}
               emptyIcon={<StarIcon sx={{ fontSize: 13, opacity: 0.2 }} />}
             />
-            <Typography className="pp-card-review-count">({reviews})</Typography>
+            <Typography className="pp-card-review-count">
+              {safeRating > 0 ? safeRating.toFixed(1) : "New"}
+            </Typography>
             <Box className="pp-card-views">
               <VisibilityIcon sx={{ fontSize: 12 }} />
               <span>{views.toLocaleString()}</span>
@@ -206,9 +196,11 @@ export function SellerPage() {
               className="pp-card-actions"
               onClick={(e) => e.stopPropagation()}
             >
-              <Tooltip title="Add to cart">
+              <Tooltip title={inStock ? "Add to cart" : "Out of stock"}>
                 <IconButton
                   className="pp-card-cart-btn"
+                  aria-label={`Add ${product.productName} to cart`}
+                  disabled={!inStock}
                   onClick={() =>
                     addToCart({
                       _id: product._id,
@@ -226,10 +218,11 @@ export function SellerPage() {
 
               <Button
                 className="pp-card-buy-btn"
-                disabled={buyNowLoading}
+                disabled={buyNowLoading || !inStock}
+                aria-label={`Buy ${product.productName} now`}
                 onClick={() => handleBuyNow(product, 1)}
               >
-                Buy Now
+                {inStock ? "Buy Now" : "Sold out"}
               </Button>
             </Box>
           </Box>
@@ -237,6 +230,23 @@ export function SellerPage() {
       </Box>
     );
   };
+
+  const activeProducts = products.filter(
+    (product: any) => String(product.productStatus ?? "") === "ACTIVE",
+  );
+  const activeProductsById = new Map(
+    activeProducts.map((product: any) => [String(product._id), product]),
+  );
+  const enrichedTopProducts = topSellingProducts
+    .map((product: any) => {
+      const fullProduct = activeProductsById.get(String(product._id));
+      return fullProduct ? { ...product, ...fullProduct } : null;
+    })
+    .filter(Boolean);
+  const topProductIds = new Set(enrichedTopProducts.map((product: any) => String(product._id)));
+  const remainingProducts = activeProducts.filter(
+    (product: any) => !topProductIds.has(String(product._id)),
+  );
 
   /* ── RENDER ── */
   return (
@@ -247,9 +257,9 @@ export function SellerPage() {
         <Button
           startIcon={<ArrowBackIcon />}
           className="sp-back-btn"
-          onClick={() => history.push("/")}
+          onClick={() => (history.length > 1 ? history.goBack() : history.push("/products"))}
         >
-          Back to Home
+          Back
         </Button>
 
         {/* ── HERO ── */}
@@ -265,9 +275,6 @@ export function SellerPage() {
               >
                 <StorefrontIcon sx={{ fontSize: 44 }} />
               </Avatar>
-              <Box className="sp-avatar-badge">
-                <VerifiedIcon sx={{ fontSize: 16, color: "var(--gold)" }} />
-              </Box>
             </Box>
 
             {/* Identity */}
@@ -282,26 +289,14 @@ export function SellerPage() {
                 />
               </Box>
 
-              <Box className="sp-rating-row">
-                <Rating
-                  value={user.userPoints ?? 0}
-                  precision={0.1}
-                  readOnly
-                  size="small"
-                  icon={<StarIcon sx={{ fontSize: 15, color: "var(--gold)" }} />}
-                  emptyIcon={<StarIcon sx={{ fontSize: 15, opacity: 0.25 }} />}
-                />
-                <Typography className="sp-rating-val">
-                  {(user.userPoints ?? 0).toFixed(1)} rating
-                </Typography>
-              </Box>
+              <Typography className="sp-store-kicker">Independent FENZO storefront</Typography>
 
               {/* Info pills */}
               <Box className="sp-info-pills">
                 {user.userPhone && (
                   <Box className="sp-info-pill">
                     <PhoneIcon sx={{ fontSize: 14 }} />
-                    <span>{user.userPhone}</span>
+                    <a href={`tel:${user.userPhone}`}>{user.userPhone}</a>
                   </Box>
                 )}
                 {user.userAddress && (
@@ -330,30 +325,27 @@ export function SellerPage() {
               <Typography className="sp-stat-value">{productsAdded}</Typography>
               <Typography className="sp-stat-label">Products Listed</Typography>
             </Box>
-            <Box className="sp-stat-divider" />
             <Box className="sp-stat">
               <Typography className="sp-stat-value">{productsSold}</Typography>
               <Typography className="sp-stat-label">Products Sold</Typography>
             </Box>
-            <Box className="sp-stat-divider" />
             <Box className="sp-stat">
               <Typography className="sp-stat-value">
                 {user.createdAt ? new Date(user.createdAt).getFullYear() : "—"}
               </Typography>
               <Typography className="sp-stat-label">Member Since</Typography>
             </Box>
-            <Box className="sp-stat-divider" />
             <Box className="sp-stat">
               <Typography className="sp-stat-value">
-                {(user.userPoints ?? 0).toFixed(1)}
+                {activeProducts.length}
               </Typography>
-              <Typography className="sp-stat-label">Rating</Typography>
+              <Typography className="sp-stat-label">In this catalog</Typography>
             </Box>
           </Box>
         </Box>
 
         {/* ── TOP SELLING ── */}
-        {topSellingProducts.length > 0 && (
+        {enrichedTopProducts.length > 0 && (
           <Box className="sp-section">
             <Box className="sp-section-head">
               <Box className="sp-section-head-left">
@@ -370,24 +362,24 @@ export function SellerPage() {
                 </Box>
               </Box>
               <Chip
-                label={`${topSellingProducts.length} items`}
+                label={`${enrichedTopProducts.length} items`}
                 className="sp-count-chip"
               />
             </Box>
 
             <div className="pp-grid">
-              {topSellingProducts.map((p) => renderProductCard(p))}
+              {enrichedTopProducts.map((p) => renderProductCard(p))}
             </div>
           </Box>
         )}
 
         {/* ── ALL PRODUCTS ── */}
-        {products.length > 0 && (
+        {remainingProducts.length > 0 && (
           <Box className="sp-section">
             <Box className="sp-section-head">
               <Box className="sp-section-head-left">
                 <Box className="sp-section-icon" sx={{ background: "rgba(200,150,12,0.10)" }}>
-                  <InventoryIcon sx={{ fontSize: 18, color: "var(--gold)" }} />
+                  <InventoryIcon sx={{ fontSize: 18, color: "var(--fz-brand)" }} />
                 </Box>
                 <Box>
                   <Typography className="sp-section-title">
@@ -399,14 +391,23 @@ export function SellerPage() {
                 </Box>
               </Box>
               <Chip
-                label={`${products.length} items`}
+                label={`${remainingProducts.length} items`}
                 className="sp-count-chip"
               />
             </Box>
 
             <div className="pp-grid">
-              {products.map((p) => renderProductCard(p))}
+              {remainingProducts.map((p) => renderProductCard(p))}
             </div>
+          </Box>
+        )}
+
+        {activeProducts.length === 0 && (
+          <Box className="sp-empty-catalog">
+            <InventoryIcon />
+            <Typography className="sp-error-title">This storefront is getting ready</Typography>
+            <Typography className="sp-error-sub">New products from this seller will appear here.</Typography>
+            <Button className="sp-error-btn" onClick={() => history.push("/products")}>Explore FENZO</Button>
           </Box>
         )}
 

@@ -1,156 +1,120 @@
-/* ============================================================
-   SELLER PAGE  —  sp-*
-   Uses shared tokens from :root (product.css)
-   ============================================================ */
-
-/* ── Loading ─────────────────────────────────────────────── */
-.sp-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 60vh;
-  background: var(--bg);
-}
-
-.sp-loading-text {
-  font-size: 14px !important;
-  color: var(--text-2) !important;
-  font-weight: 500 !important;
-  letter-spacing: 0.04em;
-}
-
-/* ── Error ───────────────────────────────────────────────── */
+.sp-loading,
 .sp-error {
   display: flex;
+  min-height: 62vh;
+  padding: 48px 20px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-height: 60vh;
-  background: var(--bg);
+  gap: 13px;
+  color: var(--fz-muted);
   text-align: center;
-  padding: 40px 24px;
+  background: var(--fz-canvas);
+}
+
+.sp-loading-text,
+.sp-error-sub {
+  max-width: 430px;
+  color: var(--fz-muted) !important;
+  font-size: 14px !important;
+  line-height: 1.65 !important;
 }
 
 .sp-error-title {
+  color: var(--fz-ink) !important;
   font-size: 24px !important;
-  font-weight: 800 !important;
-  color: var(--text) !important;
-}
-
-.sp-error-sub {
-  font-size: 14px !important;
-  color: var(--text-2) !important;
-  max-width: 380px;
-  line-height: 1.6 !important;
+  font-weight: 850 !important;
+  letter-spacing: -.025em !important;
 }
 
 .sp-error-btn {
-  height: 44px !important;
-  padding: 0 28px !important;
-  background: var(--text) !important;
-  color: #fff !important;
-  border-radius: var(--r-pill) !important;
-  font-weight: 800 !important;
-  font-size: 14px !important;
-  text-transform: none !important;
-  box-shadow: none !important;
   margin-top: 8px !important;
-  transition: all var(--dur) var(--ease) !important;
+  color: #fff !important;
+  background: var(--fz-brand) !important;
+  box-shadow: 0 10px 24px rgba(91, 91, 214, .22) !important;
 }
 
-.sp-error-btn:hover {
-  background: var(--gold) !important;
-  box-shadow: var(--sh-gold) !important;
-}
-
-/* ── Page wrapper ────────────────────────────────────────── */
 .sp-page {
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-  padding-bottom: 100px;
+  padding-bottom: 104px;
+  color: var(--fz-ink);
+  background:
+    radial-gradient(circle at 95% 4%, rgba(91, 91, 214, .10), transparent 25rem),
+    var(--fz-canvas);
 }
 
 .sp-container {
-  padding-top: 36px !important;
+  max-width: 1320px !important;
+  padding-top: 30px !important;
 }
 
-/* ── Back btn ────────────────────────────────────────────── */
 .sp-back-btn {
-  height: 36px !important;
-  padding: 0 16px !important;
-  background: var(--surface) !important;
-  border: 1px solid var(--border-2) !important;
-  color: var(--text) !important;
-  border-radius: var(--r-pill) !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  text-transform: none !important;
-  box-shadow: var(--sh-xs) !important;
-  margin-bottom: 28px !important;
-  transition: all var(--dur) var(--ease) !important;
+  margin-bottom: 24px !important;
+  color: var(--fz-muted) !important;
+  border: 1px solid var(--fz-line) !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, .76) !important;
+  box-shadow: none !important;
 }
 
 .sp-back-btn:hover {
-  border-color: var(--gold-border) !important;
-  background: var(--gold-dim) !important;
-  color: var(--gold) !important;
+  color: var(--fz-brand) !important;
+  border-color: rgba(91, 91, 214, .22) !important;
+  background: var(--fz-brand-soft) !important;
 }
 
-/* ── Hero card ───────────────────────────────────────────── */
 .sp-hero {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
+  position: relative;
+  margin-bottom: 34px;
   overflow: hidden;
-  box-shadow: var(--sh-md);
-  margin-bottom: 32px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(91, 91, 214, .55), transparent 30rem),
+    linear-gradient(140deg, #101828, #182034 62%, #252558);
+  box-shadow: 0 28px 70px rgba(16, 24, 40, .18);
+}
+
+.sp-hero::after {
+  content: "";
+  position: absolute;
+  top: -120px;
+  right: -80px;
+  width: 300px;
+  height: 300px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 50%;
+  box-shadow: 0 0 0 46px rgba(255, 255, 255, .025), 0 0 0 92px rgba(255, 255, 255, .02);
+  pointer-events: none;
 }
 
 .sp-hero-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 28px;
-  padding: 36px;
+  padding: clamp(28px, 4vw, 50px);
 }
 
-/* Avatar */
 .sp-avatar-wrap {
   position: relative;
   flex-shrink: 0;
 }
 
 .sp-avatar {
-  width: 110px !important;
-  height: 110px !important;
-  border: 3px solid var(--surface-2);
-  box-shadow: var(--sh-md);
-  background: var(--surface-3) !important;
-  color: var(--text-3) !important;
+  width: 118px !important;
+  height: 118px !important;
+  color: #5b5bd6 !important;
+  border: 5px solid rgba(255, 255, 255, .9);
+  background: #ececff !important;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .25);
 }
 
-.sp-avatar-badge {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 24px;
-  height: 24px;
-  background: var(--surface);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--surface);
-  box-shadow: var(--sh-xs);
-}
-
-/* Hero info */
 .sp-hero-info {
-  flex: 1;
   min-width: 0;
+  flex: 1;
 }
 
 .sp-hero-top {
@@ -158,136 +122,126 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
 }
 
 .sp-seller-name {
-  font-size: clamp(22px, 3vw, 30px) !important;
-  font-weight: 900 !important;
-  color: var(--text) !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1.1 !important;
+  color: #fff !important;
+  font-size: clamp(30px, 4vw, 48px) !important;
+  font-weight: 850 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.045em !important;
 }
 
 .sp-status-chip {
-  height: 24px !important;
-  background: rgba(22,163,74,0.10) !important;
-  color: #16a34a !important;
-  border: 1px solid rgba(22,163,74,0.25) !important;
-  border-radius: var(--r-pill) !important;
+  height: 27px !important;
+  color: #91e6c1 !important;
+  border: 1px solid rgba(82, 211, 157, .25) !important;
+  background: rgba(22, 133, 91, .20) !important;
   font-size: 10px !important;
+  letter-spacing: .08em !important;
+}
+
+.sp-store-kicker {
+  margin: 9px 0 19px !important;
+  color: #a5a5ff !important;
+  font-size: 11px !important;
   font-weight: 800 !important;
-  letter-spacing: 0.06em !important;
-  text-transform: uppercase !important;
+  letter-spacing: .12em !important;
+  text-transform: uppercase;
 }
 
-/* Rating */
-.sp-rating-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.sp-rating-val {
-  font-size: 13px !important;
-  color: var(--text-2) !important;
-  font-weight: 600 !important;
-}
-
-/* Info pills */
 .sp-info-pills {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 17px;
 }
 
 .sp-info-pill {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: var(--r-pill);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-2);
+  gap: 6px;
+  padding: 7px 11px;
+  color: #c9ced8;
+  border: 1px solid rgba(255, 255, 255, .10);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .06);
+  font-size: 11px;
+  font-weight: 650;
 }
 
-/* Description */
+.sp-info-pill a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.sp-info-pill a:hover {
+  color: #fff;
+}
+
 .sp-seller-desc {
+  max-width: 720px;
+  color: #b7beca !important;
   font-size: 14px !important;
-  line-height: 1.7 !important;
-  color: var(--text-2) !important;
-  max-width: 600px;
+  line-height: 1.75 !important;
 }
 
-/* ── Stats strip ─────────────────────────────────────────── */
 .sp-stats-strip {
-  display: flex;
-  align-items: center;
-  border-top: 1px solid var(--border);
-  background: var(--surface-2);
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, .045);
 }
 
 .sp-stat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 22px 16px;
-  transition: background var(--dur);
+  min-width: 0;
+  padding: 22px 14px;
+  text-align: center;
 }
 
-.sp-stat:hover {
-  background: var(--surface-3);
-}
-
-.sp-stat-value {
-  font-size: 28px !important;
-  font-weight: 900 !important;
-  color: var(--gold) !important;
-  letter-spacing: -0.02em !important;
-  line-height: 1 !important;
-}
-
-.sp-stat-label {
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  color: var(--text-3) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  margin-top: 6px !important;
+.sp-stat + .sp-stat {
+  border-left: 1px solid rgba(255, 255, 255, .08);
 }
 
 .sp-stat-divider {
-  width: 1px;
-  height: 40px;
-  background: var(--border-2);
-  flex-shrink: 0;
+  display: none;
 }
 
-/* ── Section ─────────────────────────────────────────────── */
+.sp-stat-value {
+  color: #fff !important;
+  font-size: 28px !important;
+  font-weight: 850 !important;
+  line-height: 1 !important;
+  letter-spacing: -.03em !important;
+}
+
+.sp-stat-label {
+  margin-top: 7px !important;
+  color: #98a2b3 !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase;
+}
+
 .sp-section {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-xl);
+  margin-bottom: 26px;
   overflow: hidden;
-  box-shadow: var(--sh-sm);
-  margin-bottom: 24px;
+  border: 1px solid var(--fz-line);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, .78);
+  box-shadow: var(--fz-shadow-sm);
 }
 
 .sp-section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 24px 28px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  gap: 16px;
+  padding: 26px 28px;
+  border-bottom: 1px solid var(--fz-line);
 }
 
 .sp-section-head-left {
@@ -297,122 +251,132 @@
 }
 
 .sp-section-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--r-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
+  place-items: center;
+  border-radius: 14px;
 }
 
 .sp-section-title {
-  font-size: 17px !important;
-  font-weight: 800 !important;
-  color: var(--text) !important;
-  line-height: 1.2 !important;
-  margin: 0 !important;
+  color: var(--fz-ink) !important;
+  font-size: 19px !important;
+  font-weight: 820 !important;
+  letter-spacing: -.02em !important;
 }
 
 .sp-section-sub {
+  margin-top: 3px !important;
+  color: var(--fz-muted) !important;
   font-size: 12px !important;
-  color: var(--text-3) !important;
-  font-weight: 500 !important;
-  margin-top: 2px !important;
 }
 
 .sp-count-chip {
-  height: 26px !important;
-  background: var(--gold-dim) !important;
-  color: var(--gold) !important;
-  border: 1px solid var(--gold-border) !important;
-  border-radius: var(--r-pill) !important;
+  color: var(--fz-brand) !important;
+  border: 1px solid rgba(91, 91, 214, .16) !important;
+  background: var(--fz-brand-soft) !important;
   font-size: 11px !important;
-  font-weight: 800 !important;
-  flex-shrink: 0;
 }
 
-/* Products grid inside section */
 .sp-section .pp-grid {
-  padding: 24px 28px 28px;
+  padding: 24px 28px 30px;
 }
 
-/* ── Responsive ──────────────────────────────────────────── */
-@media (max-width: 960px) {
+.sp-empty-catalog {
+  display: flex;
+  min-height: 340px;
+  padding: 46px 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  border: 1px dashed var(--fz-line-strong);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, .66);
+}
+
+.sp-empty-catalog > svg {
+  margin-bottom: 8px;
+  color: var(--fz-brand);
+  font-size: 42px;
+}
+
+@media (max-width: 900px) {
   .sp-hero-inner {
-    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sp-stats-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sp-stat:nth-child(n + 3) {
+    border-top: 1px solid rgba(255, 255, 255, .08);
+  }
+
+  .sp-stat:nth-child(odd) {
+    border-left: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .sp-page {
+    padding-bottom: 76px;
+  }
+
+  .sp-container {
+    padding-top: 18px !important;
+  }
+
+  .sp-hero {
+    border-radius: 26px;
+  }
+
+  .sp-hero-inner {
     align-items: center;
+    flex-direction: column;
     text-align: center;
-    padding: 28px 24px;
   }
 
-  .sp-hero-top {
-    justify-content: center;
+  .sp-avatar {
+    width: 92px !important;
+    height: 92px !important;
   }
 
+  .sp-hero-top,
   .sp-info-pills {
     justify-content: center;
   }
 
-  .sp-stats-strip {
-    flex-wrap: wrap;
-  }
-
-  .sp-stat {
-    flex: 1 1 calc(50% - 1px);
-    min-width: 120px;
-  }
-
-  .sp-stat-divider {
-    display: none;
-  }
-
-  .sp-stat:nth-child(odd) {
-    border-right: 1px solid var(--border-2);
-  }
-
-  .sp-stat:nth-child(-n+2) {
-    border-bottom: 1px solid var(--border-2);
-  }
-}
-
-@media (max-width: 768px) {
-  .sp-container {
-    padding-top: 20px !important;
-  }
-
-  .sp-hero-inner {
-    padding: 22px 18px;
-  }
-
-  .sp-avatar {
-    width: 88px !important;
-    height: 88px !important;
+  .sp-section {
+    border-radius: 23px;
   }
 
   .sp-section-head {
-    padding: 18px 18px;
-    flex-wrap: wrap;
-    gap: 10px;
+    padding: 20px 17px;
   }
 
   .sp-section .pp-grid {
-    padding: 16px 18px 20px;
+    padding: 16px;
   }
 }
 
-@media (max-width: 480px) {
-  .sp-stat {
-    flex: 1 1 100%;
-    border-right: none !important;
-    border-bottom: 1px solid var(--border-2);
-  }
-
-  .sp-stat:last-child {
-    border-bottom: none;
+@media (max-width: 420px) {
+  .sp-seller-name {
+    font-size: 30px !important;
   }
 
   .sp-stat-value {
-    font-size: 24px !important;
+    font-size: 23px !important;
+  }
+
+  .sp-stat-label {
+    letter-spacing: .04em !important;
+  }
+
+  .sp-section-icon {
+    display: none;
   }
 }

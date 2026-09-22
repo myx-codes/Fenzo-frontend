@@ -1,189 +1,210 @@
-import React from "react";
-import { Box, Button, Typography, Divider } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
-import Menu from "@mui/material/Menu";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import CloseIcon from "@mui/icons-material/Close";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import { CartItem } from "src/lib/types/cart";
-import { serverApi } from "src/lib/config";
-import { useCart } from "../../context/CartContext";
+import React, { useState } from "react";
+import { Badge, Box, Button, Drawer, IconButton, Typography } from "@mui/material";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import { useHistory } from "react-router-dom";
-import "../../../css/basket.css";
+import { CartItem } from "../../../lib/types/cart";
+import { serverApi } from "../../../lib/config";
+import { useCart } from "../../context/CartContext";
 
 export interface BasketProps {
   iconButtonClassName?: string;
 }
 
+const FREE_SHIPPING_THRESHOLD = 100;
+
 export default function Basket({ iconButtonClassName }: BasketProps = {}) {
   const history = useHistory();
   const { cartItems, onAdd, onRemove, onDelete, onDeleteAll } = useCart();
+  const [open, setOpen] = useState(false);
 
-  const itemsPrice = cartItems.reduce((a: number, c: CartItem) => a + c.quantity * c.price, 0);
-  const shippingCost = itemsPrice > 0 && itemsPrice < 100 ? 5 : 0;
-  const totalPrice = (itemsPrice + shippingCost).toFixed(2);
+  const subtotal = cartItems.reduce(
+    (sum: number, item: CartItem) => sum + item.quantity * Number(item.price || 0),
+    0,
+  );
+  const shipping = subtotal > 0 && subtotal < FREE_SHIPPING_THRESHOLD ? 5 : 0;
+  const total = subtotal + shipping;
+  const totalUnits = cartItems.reduce((sum: number, item: CartItem) => sum + item.quantity, 0);
+  const amountUntilFreeShipping = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const closeDrawer = () => setOpen(false);
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(e.currentTarget);
-  const handleClose = () => setAnchorEl(null);
-  const handleCheckout = () => {
-    handleClose();
-    history.push("/checkout");
-  };
-  const goToProductDetail = (productId: string) => {
-    handleClose();
+  const goToProduct = (productId: string) => {
+    closeDrawer();
     history.push(`/products/detail/${productId}`);
+  };
+
+  const goToProducts = () => {
+    closeDrawer();
+    history.push("/products");
+  };
+
+  const goToCheckout = () => {
+    closeDrawer();
+    history.push("/checkout");
   };
 
   return (
     <Box className="basket-root">
       <IconButton
-        aria-label="cart"
-        aria-controls={open ? "basket-menu" : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
-        onClick={handleClick}
         className={iconButtonClassName || "basket-trigger"}
+        onClick={() => setOpen(true)}
+        aria-label={`Open cart with ${totalUnits} ${totalUnits === 1 ? "item" : "items"}`}
+        aria-haspopup="dialog"
       >
-        <Badge badgeContent={cartItems.length} color="error" className="basket-badge">
-          <ShoppingCartIcon className="basket-trigger-icon" sx={iconButtonClassName ? { color: "inherit" } : undefined} />
+        <Badge badgeContent={totalUnits} color="error" className="basket-badge">
+          <ShoppingCartRoundedIcon className="basket-trigger-icon" />
         </Badge>
       </IconButton>
 
-      <Menu
-        anchorEl={anchorEl}
-        id="basket-menu"
+      <Drawer
+        anchor="right"
         open={open}
-        onClose={handleClose}
-        PaperProps={{
-          elevation: 0,
-          className: "basket-menu-paper",
-          sx: {
-            width: 380,
-            maxWidth: "calc(100vw - 24px)",
-            borderRadius: 3,
-            overflow: "hidden",
-            mt: 1.5,
-            border: "1px solid var(--basket-border)",
-            boxShadow: "0 24px 48px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.08)",
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              top: 0,
-              right: 20,
-              width: 12,
-              height: 12,
-              bgcolor: "background.paper",
-              transform: "translateY(-50%) rotate(45deg)",
-              borderLeft: "1px solid var(--basket-border)",
-              borderTop: "1px solid var(--basket-border)",
-            },
-          },
-        }}
-        transformOrigin={{ horizontal: "right", vertical: "top" }}
-        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        onClose={closeDrawer}
+        ModalProps={{ keepMounted: true }}
+        PaperProps={{ className: "basket-drawer-paper" }}
       >
-        <div className="basket-menu-container">
-          {/* Header */}
-          <div className="basket-header">
-            <Typography className="basket-title">Your cart</Typography>
-            {cartItems.length > 0 && (
-              <Button
-                size="small"
-                startIcon={<DeleteForeverIcon sx={{ fontSize: 18 }} />}
-                onClick={onDeleteAll}
-                className="basket-clear-btn"
-                disableRipple
-              >
-                Clear all
-              </Button>
-            )}
-          </div>
-          <Divider className="basket-divider" />
+        <Box className="basket-drawer" role="dialog" aria-modal="true" aria-labelledby="basket-title">
+          <Box className="basket-header">
+            <Box>
+              <Typography component="p" className="basket-eyebrow">Your selection</Typography>
+              <Typography component="h2" id="basket-title" className="basket-title">
+                Shopping cart
+                <span>{totalUnits}</span>
+              </Typography>
+            </Box>
+            <IconButton onClick={closeDrawer} className="basket-close" aria-label="Close cart">
+              <CloseRoundedIcon />
+            </IconButton>
+          </Box>
 
-          {/* Items list */}
-          <div className="basket-items-list">
+          {cartItems.length > 0 && (
+            <Box className="basket-shipping-note">
+              <LocalShippingOutlinedIcon aria-hidden="true" />
+              <Box>
+                <strong>
+                  {amountUntilFreeShipping > 0
+                    ? `$${amountUntilFreeShipping.toFixed(2)} away from free delivery`
+                    : "You unlocked free delivery"}
+                </strong>
+                <span>Fast, tracked delivery on every order.</span>
+              </Box>
+            </Box>
+          )}
+
+          <Box className="basket-items-list">
             {cartItems.length === 0 ? (
-              <div className="basket-empty">
-                <div className="basket-empty-icon-wrap">
-                  <ShoppingCartOutlinedIcon className="basket-empty-icon" />
-                </div>
-                <Typography className="basket-empty-title">Your cart is empty</Typography>
-                <Typography className="basket-empty-text">Add items from the store to get started.</Typography>
-              </div>
+              <Box className="basket-empty">
+                <span className="basket-empty-icon-wrap">
+                  <ShoppingBagOutlinedIcon className="basket-empty-icon" />
+                </span>
+                <Typography className="basket-empty-title">Your cart is ready for something new</Typography>
+                <Typography className="basket-empty-text">
+                  Explore curated essentials and add your favorites here.
+                </Typography>
+                <Button className="basket-browse-button" endIcon={<ArrowForwardRoundedIcon />} onClick={goToProducts}>
+                  Explore products
+                </Button>
+              </Box>
             ) : (
               cartItems.map((item: CartItem) => {
-                const imagePath = item.image ? `${serverApi}/${item.image}` : "";
+                const imagePath = item.image ? `${serverApi}/${item.image}` : "/img/product-placeholder.svg";
                 return (
-                  <div key={item._id} className="basket-item">
-                    <img
-                      src={imagePath}
-                      alt={item.name}
-                      className="basket-item-img"
-                      onClick={() => goToProductDetail(item._id)}
-                      style={{ cursor: "pointer" }}
-                    />
-                    <div className="basket-item-details">
-                      <Typography className="basket-item-name" title={item.name}>
+                  <article key={item._id} className="basket-item">
+                    <button
+                      type="button"
+                      className="basket-item-image-button"
+                      onClick={() => goToProduct(item._id)}
+                      aria-label={`View ${item.name}`}
+                    >
+                      <img
+                        src={imagePath}
+                        alt={item.name}
+                        className="basket-item-img"
+                        onError={(event) => {
+                          (event.currentTarget as HTMLImageElement).src = "/img/product-placeholder.svg";
+                        }}
+                      />
+                    </button>
+
+                    <Box className="basket-item-details">
+                      <button type="button" className="basket-item-name" onClick={() => goToProduct(item._id)}>
                         {item.name}
+                      </button>
+                      <Typography className="basket-item-price">
+                        ${Number(item.price || 0).toFixed(2)}
                       </Typography>
-                      <Typography className="basket-item-price">${item.price?.toFixed(2) ?? item.price}</Typography>
-                      <div className="basket-qty-controls">
-                        <IconButton size="small" onClick={() => onRemove(item)} className="basket-qty-btn" aria-label="Decrease">
-                          <RemoveIcon sx={{ fontSize: 16 }} />
+                      <Box className="basket-qty-controls" aria-label={`Quantity for ${item.name}`}>
+                        <IconButton
+                          size="small"
+                          onClick={() => onRemove(item)}
+                          className="basket-qty-btn"
+                          aria-label={`Decrease ${item.name} quantity`}
+                        >
+                          <RemoveRoundedIcon />
                         </IconButton>
-                        <span className="basket-qty-value">{item.quantity}</span>
-                        <IconButton size="small" onClick={() => onAdd(item)} className="basket-qty-btn" aria-label="Increase">
-                          <AddIcon sx={{ fontSize: 16 }} />
+                        <span className="basket-qty-value" aria-live="polite">{item.quantity}</span>
+                        <IconButton
+                          size="small"
+                          onClick={() => onAdd(item)}
+                          className="basket-qty-btn"
+                          aria-label={`Increase ${item.name} quantity`}
+                        >
+                          <AddRoundedIcon />
                         </IconButton>
-                      </div>
-                    </div>
-                    <IconButton size="small" onClick={() => onDelete(item)} className="basket-item-delete" aria-label="Remove">
-                      <CloseIcon sx={{ fontSize: 18 }} />
+                      </Box>
+                    </Box>
+
+                    <IconButton
+                      size="small"
+                      onClick={() => onDelete(item)}
+                      className="basket-item-delete"
+                      aria-label={`Remove ${item.name} from cart`}
+                    >
+                      <DeleteOutlineRoundedIcon />
                     </IconButton>
-                  </div>
+                  </article>
                 );
               })
             )}
-          </div>
+          </Box>
 
-          {/* Footer */}
           {cartItems.length > 0 && (
-            <>
-              <Divider className="basket-divider" />
-              <div className="basket-footer">
-                <div className="basket-summary-row">
-                  <span className="basket-summary-label">Subtotal</span>
-                  <span className="basket-summary-value">${itemsPrice.toFixed(2)}</span>
-                </div>
-                <div className="basket-summary-row">
-                  <span className="basket-summary-label">Shipping</span>
-                  <span className="basket-summary-value">${shippingCost.toFixed(2)}</span>
-                </div>
-                <div className="basket-summary-row basket-summary-total">
-                  <span className="basket-summary-total-label">Total</span>
-                  <span className="basket-summary-total-value">${totalPrice}</span>
-                </div>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  className="btn-buy"
-                  startIcon={<ShoppingCartIcon />}
-                  onClick={handleCheckout}
-                >
-                  Order
-                </Button>
-              </div>
-            </>
+            <Box className="basket-footer">
+              <button type="button" className="basket-clear-button" onClick={onDeleteAll}>
+                Clear cart
+              </button>
+              <Box className="basket-summary">
+                <Box className="basket-summary-row">
+                  <span>Subtotal</span>
+                  <strong>${subtotal.toFixed(2)}</strong>
+                </Box>
+                <Box className="basket-summary-row">
+                  <span>Delivery</span>
+                  <strong>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</strong>
+                </Box>
+                <Box className="basket-summary-row basket-summary-total">
+                  <span>Total</span>
+                  <strong>${total.toFixed(2)}</strong>
+                </Box>
+              </Box>
+              <Button fullWidth className="basket-checkout-button" endIcon={<ArrowForwardRoundedIcon />} onClick={goToCheckout}>
+                Continue to checkout
+              </Button>
+              <Typography className="basket-secure-note">
+                <LockOutlinedIcon /> Secure checkout
+              </Typography>
+            </Box>
           )}
-        </div>
-      </Menu>
+        </Box>
+      </Drawer>
     </Box>
   );
 }
