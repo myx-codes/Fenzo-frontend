@@ -1654,7 +1654,8 @@ button.hero-floating-card {
 }
 
 .homepage .lp-products-section .pp-card-img {
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
 }
 
 .homepage .lp-products-section .pp-card-info {
