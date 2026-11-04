@@ -201,3 +201,24 @@ child links, single-group expansion, toggle collapse, route navigation, Escape
 and focus restoration, ArrowDown/Up, Home/End support, and outside-click closure.
 No horizontal overflow; long mobile lists scroll within the bounded panel.
 Typecheck, lint, diff whitespace validation and production build passed.
+
+## Follow-up: compact category disclosure
+
+User screenshot showed excessive unused width, a large introduction, duplicate
+product destinations and decorative footer copy. Replaced the 720px menu with a
+380px maximum-width disclosure. Collapsed height is 295px with four 44px group
+controls. Removed the eyebrow, duplicate top product link and footer slogan;
+retained one all-products destination and compact guest signup.
+
+Desktop children use two columns inside the same narrow panel; phones retain a
+single scrollable column. No category identifiers or route destinations changed.
+Verified initial collapse, group expansion, Escape/focus restoration, and bounds
+at 1440x1000, 390x844, 320x568 and 667x375. No horizontal overflow.
+
+`docs/design-qa/compact-menu-comparison.webp` places the supplied screenshot on
+the left and the implementation crop on the right at their captured scale. The
+first Browser clip unexpectedly included the wrong page area; rejected it and
+extracted the menu from the accepted full viewport capture using its measured
+bounds. Reviewed the corrected comparison and desktop expanded/mobile captures.
+Typecheck, lint, production build and whitespace checks passed. Final result:
+passed for the requested compact menu change.

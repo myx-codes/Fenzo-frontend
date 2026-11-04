@@ -156,8 +156,7 @@ export function CategoryNavigation({ compact = false }: { compact?: boolean }) {
         onKeyDown={navigateLinks}
       >
         <div className="fz-mega-heading">
-          <div><span className="fz-mega-eyebrow">FIND YOUR EVERYDAY</span><h2 id={`${panelId}-title`}>Browse categories</h2></div>
-          <NavLink exact to="/products" className="fz-mega-all" onClick={() => close()}>All products <ArrowForwardRoundedIcon aria-hidden="true" /></NavLink>
+          <h2 id={`${panelId}-title`}>Categories</h2>
           <button type="button" className="fz-mega-close" aria-label="Close categories" onClick={() => close(true)}><CloseRoundedIcon /></button>
         </div>
         <div className="fz-mega-body">
@@ -189,7 +188,7 @@ export function CategoryNavigation({ compact = false }: { compact?: boolean }) {
           <NavLink to="/products" onClick={() => close()}>Browse all products <ArrowForwardRoundedIcon aria-hidden="true" /></NavLink>
           {compact && !authUser
             ? <NavLink to="/signup" onClick={() => close()}>{t("signUp")} <ArrowForwardRoundedIcon aria-hidden="true" /></NavLink>
-            : <span>Something for every part of your day.</span>}
+            : null}
         </div>
       </div>}
     </nav>
