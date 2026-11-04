@@ -1,0 +1,167 @@
+/* Shared type roles. Loaded after legacy !important page sizes. Icons, brand
+   marks and decorative illustrations keep their independent dimensions. */
+:root {
+  --fz-type-caption: .75rem;
+  --fz-type-body: .875rem;
+  --fz-type-input: 1rem;
+  --fz-type-lead: 1.125rem;
+  --fz-type-heading: 1.25rem;
+  --fz-type-section: clamp(1.375rem, 1.25rem + .3vw, 1.5rem);
+  --fz-type-page: clamp(1.75rem, 1.5rem + .6vw, 2rem);
+  --fz-type-display: clamp(2rem, 1.5rem + 1.5vw, 2.5rem);
+}
+body { font-size: var(--fz-type-body); line-height: 1.6; }
+.swal2-title, .MuiDialogTitle-root { font-size: var(--fz-type-heading) !important; line-height: 1.35 !important; }
+.swal2-html-container, .swal2-styled, .MuiDialogContentText-root, .MuiTableCell-root {
+  font-size: var(--fz-type-body) !important; line-height: 1.6 !important;
+}
+.MuiChip-label, .MuiTooltip-tooltip { font-size: var(--fz-type-caption) !important; }
+#root :is(p, .MuiTypography-body1, .MuiTypography-body2) {
+  font-size: var(--fz-type-body) !important; line-height: 1.6 !important;
+}
+#root h1 { font-size: var(--fz-type-page) !important; line-height: 1.2 !important; }
+#root h2 { font-size: var(--fz-type-section) !important; line-height: 1.25 !important; }
+#root :is(h3, h4) { font-size: var(--fz-type-heading) !important; line-height: 1.3 !important; }
+#root :is(h5, h6) { font-size: var(--fz-type-input) !important; line-height: 1.4 !important; }
+
+/* Reading text: catalog, account, checkout, support and authentication. */
+#root :is(
+  .signal-hero-description, .ad-subtitle, .lp-section-sub, .stat-desc,
+  .event-desc, .help-subtitle, .help-topic-copy, .help-answer, .help-card-text,
+  .orders-subtitle, .orders-state-text, .orders-inline-error, .order-item-name,
+  .order-items-empty, .checkout-subtitle, .checkout-section-copy, .checkout-item-name,
+  .checkout-payment-label strong, .checkout-payment-label span,
+  .checkout-payment-notice p, .checkout-confirm-row strong, .checkout-confirm-row p,
+  .checkout-summary-product-copy p, .checkout-summary-product > strong,
+  .checkout-summary-row p, .checkout-price-lines, .checkout-summary-total span,
+  .checkout-empty-text, .sp-seller-desc, .sp-section-sub, .sp-error-sub,
+  .pc-desc, .pc-section-subtitle, .pc-review-form-sub, .pc-review-comment,
+  .pc-review-author, .pc-notfound-sub, .pp-empty-sub,
+  .basket-empty-text, .basket-item-name, .basket-summary-row,
+  .auth-story-description, .auth-form-subtitle, .auth-switch-text, .auth-benefit p,
+  .footer-description, .footer-link, .footer-contact,
+  .account-header-stats, .account-profile-metrics, .account-order-total,
+  .account-wishlist-card .MuiTypography-subtitle2, .menu-username, .menu-item
+) { font-size: var(--fz-type-body) !important; line-height: 1.6 !important; }
+
+/* The same title role applies to semantic headings and MUI text blocks. */
+#root :is(
+  .signal-catalog-heading h1, .pc-product-name, .help-title, .orders-title,
+  .checkout-title, .sp-seller-name, .auth-form-title, .not-found-title,
+  .account-page-header .MuiTypography-h4
+) {
+  font-size: var(--fz-type-page) !important; line-height: 1.2 !important;
+  letter-spacing: -.025em !important;
+}
+#root :is(.signal-hero h1, .ad-title, .auth-story-title, .footer-cta-title) {
+  font-size: var(--fz-type-display) !important; line-height: 1.15 !important;
+  letter-spacing: -.025em !important;
+}
+#root :is(
+  .lp-section-title, .pc-section-title, .pc-related-title, .help-section-title,
+  .checkout-section-title, .sp-section-title, .basket-title,
+  .account-panel-heading .MuiTypography-h5
+) {
+  font-size: var(--fz-type-section) !important; line-height: 1.25 !important;
+  letter-spacing: -.02em !important;
+}
+#root :is(
+  .event-title, .help-card-title, .help-no-result-title, .orders-state-title,
+  .checkout-empty-title, .basket-empty-title, .pp-empty-title, .pc-notfound-title,
+  .sp-error-title, .pc-review-form-title, .checkout-summary-title
+) { font-size: var(--fz-type-heading) !important; line-height: 1.35 !important; }
+#root :is(
+  .help-topic-title, .seller-name, .help-question, .order-id,
+  .account-profile-summary .MuiTypography-h6, .pc-review-empty-title
+) { font-size: var(--fz-type-input) !important; line-height: 1.4 !important; }
+
+/* Cards retain legible names and prices across breakpoints and list view. */
+#root :is(.pp-card-name, .pc-rcard-name, .lp-card-name) {
+  font-size: var(--fz-type-body) !important; line-height: 1.4 !important;
+  min-height: 2.8em !important;
+}
+#root :is(.pp-card-price, .pc-rcard-price, .lp-card-price, .basket-summary-total strong) {
+  font-size: var(--fz-type-heading) !important; line-height: 1.3 !important;
+}
+#root :is(.pc-price-main, .total-amount, .checkout-total-row p:last-child, .checkout-summary-total strong) {
+  font-size: var(--fz-type-page) !important; line-height: 1.2 !important;
+}
+#root :is(.pc-rating-score, .sp-stat-value) {
+  font-size: var(--fz-type-section) !important; line-height: 1.25 !important;
+}
+#root :is(.order-item-price, .checkout-item-price, .basket-item-price, .basket-summary-total) {
+  font-size: var(--fz-type-input) !important; line-height: 1.4 !important;
+}
+
+/* Metadata never shrinks to the legacy 7–9px phone sizes. */
+#root :is(
+  small, .MuiTypography-caption, .MuiTypography-overline,
+  .signal-eyebrow, .signal-breadcrumbs, .stat-label, .hero-kicker,
+  .lp-section-eyebrow, .event-meta, .event-date, .event-badge, .seller-caption,
+  .pp-header-count, .pp-results-label, .pp-filter-chip, .pp-card-collection,
+  .pp-card-stock, .pp-card-review-count, .pp-card-views, .pp-card-list-price,
+  .pp-card-delivery, .pp-card-deal-badge, .pc-rcard-reviews, .pc-rcard-list-price,
+  .pc-rcard-delivery, .pc-rcard-deal-badge, .pc-cat-pill, .pc-views-pill,
+  .pc-img-counter, .pc-collection-badge, .pc-rating-count, .pc-stock-status,
+  .pc-price-unit, .pc-seller-label, .pc-perk-title, .pc-perk-sub,
+  .pc-section-eyebrow, .pc-rating-total, .pc-rating-bar-row, .pc-review-date,
+  .help-kicker, .help-section-eyebrow, .help-result-count, .help-question-index,
+  .orders-eyebrow, .orders-count-card small, .order-overline, .order-date,
+  .order-item-meta, .status-badge, .total-label,
+  .checkout-kicker, .checkout-header-note, .checkout-stepper .MuiStepLabel-label,
+  .checkout-item-meta, .checkout-card-tags span, .checkout-card-type,
+  .checkout-summary-eyebrow, .checkout-summary-count, .checkout-summary-img-wrap span,
+  .checkout-delivery-progress > div:first-child, .checkout-free-delivery,
+  .checkout-trust-note, .checkout-card-tags > p,
+  .sp-status-chip, .sp-store-kicker, .sp-info-pill, .sp-stat-label, .sp-count-chip,
+  .auth-eyebrow, .auth-form-eyebrow, .auth-legal, .auth-strength-label,
+  .auth-field-message, .auth-alert, .basket-eyebrow, .basket-title span,
+  .basket-shipping-note strong, .basket-shipping-note span, .basket-secure-note,
+  .footer-heading, .footer-contact small, .footer-bottom-meta span,
+  .footer-bottom > p, .footer-trust-pill, .footer-cta-eyebrow,
+  .account-eyebrow, .account-panel-kicker, .account-profile-metrics span,
+  .account-order-table-header .MuiTypography-root, .account-order-status,
+  .menu-email, .site-account-copy small
+) { font-size: var(--fz-type-caption) !important; line-height: 1.5 !important; }
+#root :is(.brands-intro .lp-section-title, .ad-note strong, .ad-note span) {
+  font-size: var(--fz-type-caption) !important; line-height: 1.5 !important;
+}
+
+/* Textual controls share a size; explicit icon dimensions stay independent. */
+.MuiButton-root, .MuiMenuItem-root, .MuiTooltip-tooltip,
+#root :is(
+  button, .signal-primary-link, .signal-text-link, .signal-cart-label,
+  .signal-category-link, .fz-nav-link, .fz-category-trigger, .fz-mega-link,
+  .fz-mega-footer a, .fz-mega-group-toggle, .account-tabs .MuiTab-root,
+  .site-login-button, .site-signup-button, .mobile-auth-btn,
+  .pc-back-btn, .pc-bread-link, .pc-bread-current, .pc-related-see-all,
+  .basket-qty-value, .pc-qty-label, .pc-qty-value, .site-account-copy strong
+) { font-size: var(--fz-type-body) !important; line-height: 1.4 !important; }
+#root :is(label, .auth-field-label, .MuiFormLabel-root) {
+  font-size: var(--fz-type-body) !important; line-height: 1.5 !important;
+}
+#root :is(input, textarea, select, .MuiInputBase-input, .site-search-input, .mobile-search-input) {
+  font-size: var(--fz-type-input) !important; line-height: 1.5 !important;
+}
+#root .fz-mega-heading h2 { font-size: var(--fz-type-input) !important; }
+#root :is(.mobile-bottom-nav .MuiBottomNavigationAction-label, .site-language-select, .mobile-lang-select) {
+  font-size: var(--fz-type-caption) !important; line-height: 1.4 !important;
+}
+#root .MuiBadge-badge { font-size: var(--fz-type-caption) !important; min-width: 20px; min-height: 20px; }
+#root .event-explore-btn { width: auto !important; max-width: 100%; white-space: normal; height: auto; min-height: 44px; }
+#root .event-explore-btn .MuiButton-endIcon { margin-right: 0; flex-shrink: 0; }
+
+/* Legible controls reflow instead of squeezing into the former tiny row. */
+.homepage .lp-products-section .pp-card-bottom {
+  flex-direction: column !important; align-items: stretch !important;
+}
+@media (max-width: 599px) {
+  #root .signal-cart-label { display: inline; }
+  #root :is(.homepage .lp-products-section, .pp-page, .sp-page) .pp-card-actions {
+    flex-direction: column; align-items: stretch;
+  }
+  #root :is(.homepage .lp-products-section, .pp-page, .sp-page) .pp-card-actions > span { width: 100%; }
+  #root :is(.homepage .lp-products-section, .pp-page, .sp-page) :is(.pp-card-cart-btn, .pp-card-buy-btn) {
+    width: 100% !important; min-height: 44px !important;
+  }
+}

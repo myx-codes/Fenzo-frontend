@@ -222,3 +222,48 @@ extracted the menu from the accepted full viewport capture using its measured
 bounds. Reviewed the corrected comparison and desktop expanded/mobile captures.
 Typecheck, lint, production build and whitespace checks passed. Final result:
 passed for the requested compact menu change.
+
+## Follow-up: shared typography across the storefront
+
+Replaced inconsistent page sizes with eight shared rem-based roles in
+`src/css/typography.css`; the MUI theme consumes the same CSS variables. Existing
+editorial/sans-serif families remain. Page titles now range from 28–32px, section
+headings 22–24px, body/controls 14px, fields 16px, captions 12px. Campaign display
+copy is capped at 40px. See `docs/typography.md` for the complete role mapping.
+
+The scoped migration layer deliberately follows legacy important declarations.
+It covers homepage, catalog, product detail, seller, support, login/signup,
+account, orders, checkout, cart, header/footer, dialogs and error states. Icons,
+brand marks and decorative 404 artwork retain their independent sizing. Forms
+and route/business logic are unchanged.
+
+Verified seven public pages (home, listing, detail, login, signup, help, seller)
+at 1440x1000, 768x1024, 390x844 and 320x568: 28 page/viewport states, without
+horizontal overflow or rendered text below 12px. Product names are 14px, card
+prices 20px, editable fields 16px. Help's 76px title is now 32px on desktop.
+
+Mobile purchase controls now stack and show their full 14px labels. An initial
+control scan reported the campaign button's end icon extending 4px beyond its
+box; removed the icon's negative margin and rechecked the homepage at all four
+sizes, with no oversized control contents. The first 28-state run preceded that
+icon-only correction; only affected homepage states were repeated. Captures were
+reviewed for readable labels, line wrapping and card balance.
+
+Category expansion/Escape and FAQ expansion/collapse passed with the new text
+sizes. No browser warnings/errors were recorded in the final check. Typecheck,
+lint, existing 4 tests and isolated production build passed.
+
+Evidence: `docs/design-qa/typography-help-comparison.webp` shows before/after in
+the same collapsed FAQ state, proportionally resized to equal widths. The
+`typography-*-1440.webp` and mobile control/detail/login captures record the
+result. No comparison image was stretched.
+`typography-help-focus.webp` compares the heading and supporting text at native
+capture scale; this makes the reduction from 76px to 32px readable without
+downscaling the full pages. Browser captures had different bottom capture bounds,
+so the focused comparison is the primary evidence for title sizing.
+
+Limits: orders/profile redirect guests to login; checkout requires registration.
+Their typography is mapped in source but signed-in content was not visually
+verified. The guest checkout dialog and not-found page were inspected. No
+account, order or payment was created. Final result: passed for public-page
+typography; authenticated visual coverage remains unavailable without login.

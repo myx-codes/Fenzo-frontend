@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 import shadow from "./shadow";
+import typography from "./typography";
 
 const theme = createTheme({
   palette: {
@@ -33,19 +34,7 @@ const theme = createTheme({
     borderRadius: 16,
   },
   shadows: shadow as any,
-  typography: {
-    fontFamily:
-      'Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    h1: { fontWeight: 800, letterSpacing: "-0.045em", lineHeight: 1.04 },
-    h2: { fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.08 },
-    h3: { fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.12 },
-    h4: { fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.16 },
-    h5: { fontWeight: 750, letterSpacing: "-0.02em", lineHeight: 1.2 },
-    h6: { fontWeight: 750, letterSpacing: "-0.015em", lineHeight: 1.25 },
-    button: { fontWeight: 750, textTransform: "none" },
-    body1: { lineHeight: 1.65 },
-    body2: { lineHeight: 1.6 },
-  },
+  typography,
   components: {
     MuiCssBaseline: {
       styleOverrides: {

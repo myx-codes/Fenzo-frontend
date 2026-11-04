@@ -35,6 +35,7 @@ import "../css/check-out.css";
 import "../css/coupang.css";
 import "../css/header-navigation.css";
 import "../css/signal.css";
+import "../css/typography.css";
 
 function App() {
   const location = useLocation();
