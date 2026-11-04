@@ -47,6 +47,7 @@ type TranslationMap = {
   yourEmail: string;
   allRightsReserved: string;
   loginTitle: string;
+  welcomeBack: string;
   signupTitle: string;
   username: string;
   password: string;
@@ -110,6 +111,7 @@ const en: TranslationMap = {
   yourEmail: "Your email...",
   allRightsReserved: "All rights reserved.",
   loginTitle: "Login",
+  welcomeBack: "Welcome back",
   signupTitle: "Sign up",
   username: "Username",
   password: "Password",
@@ -173,6 +175,7 @@ const uz: TranslationMap = {
   yourEmail: "Emailingiz...",
   allRightsReserved: "Barcha huquqlar himoyalangan.",
   loginTitle: "Kirish",
+  welcomeBack: "Xush kelibsiz",
   signupTitle: "Ro'yxatdan o'tish",
   username: "Foydalanuvchi nomi",
   password: "Parol",
@@ -236,6 +239,7 @@ const ko: TranslationMap = {
   yourEmail: "이메일을 입력하세요...",
   allRightsReserved: "모든 권리 보유.",
   loginTitle: "로그인",
+  welcomeBack: "다시 오신 것을 환영합니다",
   signupTitle: "회원가입",
   username: "사용자 이름",
   password: "비밀번호",

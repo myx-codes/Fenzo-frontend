@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { AppBar, Badge, Box, Button, IconButton, MenuItem, Select, Toolbar } from "@mui/material";
+import { AppBar, Badge, Box, IconButton, MenuItem, Select, Toolbar } from "@mui/material";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
 import { NavLink, useHistory } from "react-router-dom";
 import { languageCodes, languageOptions, SupportedLanguage } from "../../i18n/translations";
 import { useWishlistContext } from "../../context/WishlistContext";
 import { useGlobals } from "../../hooks/useGlobals";
 import Basket from "./Basket";
+import { Brand } from "./Brand";
+import { CategoryNavigation } from "./CategoryNavigation";
 
 export function MobileHeader() {
   const history = useHistory();
@@ -22,11 +25,9 @@ export function MobileHeader() {
   };
 
   return (
-    <AppBar position="sticky" className="mobile-appbar" elevation={0} component="header">
+    <AppBar position="sticky" className="mobile-appbar fz-header fz-header--compact" elevation={0} component="header">
       <Toolbar className="mobile-toolbar">
-        <Box className="mobile-logo-wrap" component={NavLink} to="/" aria-label="FENZO home">
-          <img src="/icons/logo2.png" alt="FENZO" className="mobile-logo" />
-        </Box>
+        <Brand />
 
         <Box className="mobile-actions">
           <Box className="mobile-language-control">
@@ -62,14 +63,9 @@ export function MobileHeader() {
           <Basket iconButtonClassName="mobile-icon-button" />
 
           {authUser ? null : (
-            <Box className="mobile-auth-actions">
-              <Button component={NavLink} to="/login" className="mobile-auth-btn mobile-login-btn">
-                {t("login")}
-              </Button>
-              <Button component={NavLink} to="/signup" className="mobile-auth-btn mobile-signup-btn">
-                {t("signUp")}
-              </Button>
-            </Box>
+            <IconButton component={NavLink} to="/login" className="mobile-icon-button" aria-label={t("login")}>
+              <PersonOutlineRoundedIcon />
+            </IconButton>
           )}
         </Box>
       </Toolbar>
@@ -88,6 +84,7 @@ export function MobileHeader() {
           <SearchRoundedIcon />
         </button>
       </Box>
+      <CategoryNavigation compact />
     </AppBar>
   );
 }

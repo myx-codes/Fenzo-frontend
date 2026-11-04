@@ -37,7 +37,7 @@ export function BestProducts() {
         <div className="lp-section-head">
           <div>
             <span className="lp-section-eyebrow">Trending on FENZO</span>
-            <Typography className="lp-section-title">Popular right now</Typography>
+            <Typography component="h2" className="lp-section-title">Popular right now</Typography>
             <Typography className="lp-section-sub">
               Most-viewed products shoppers keep coming back to.
             </Typography>
@@ -118,7 +118,7 @@ export function BestProducts() {
                     {product.productName}
                   </Typography>
 
-                  <Box className="pp-card-rating-row">
+                  <Box className={`pp-card-rating-row ${safeRating === 0 ? "is-unrated" : ""}`}>
                     <Rating
                       value={safeRating}
                       precision={0.5}
@@ -128,7 +128,7 @@ export function BestProducts() {
                       emptyIcon={<StarIcon sx={{ fontSize: 13, opacity: 0.2 }} />}
                     />
                     <Typography className="pp-card-review-count">
-                      ({safeRating.toFixed(1)})
+                      {safeRating > 0 ? safeRating.toFixed(1) : "No reviews yet"}
                     </Typography>
                     <Box className="pp-card-views">
                       <VisibilityIcon sx={{ fontSize: 12 }} />
@@ -165,6 +165,7 @@ export function BestProducts() {
                           }
                         >
                           <ShoppingCartIcon sx={{ fontSize: 16 }} />
+                          <span className="signal-cart-label">Add to cart</span>
                         </IconButton>
                       </Tooltip>
 

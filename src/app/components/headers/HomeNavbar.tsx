@@ -14,8 +14,6 @@ import {
   Typography,
 } from "@mui/material";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
-import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
-import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
@@ -26,6 +24,8 @@ import { useWishlistContext } from "../../context/WishlistContext";
 import { useGlobals } from "../../hooks/useGlobals";
 import { serverApi } from "../../../lib/config";
 import Basket from "./Basket";
+import { Brand } from "./Brand";
+import { CategoryNavigation } from "./CategoryNavigation";
 
 type DesktopNavbarProps = {
   sticky?: boolean;
@@ -37,43 +37,6 @@ export function DesktopNavbar({ sticky = false }: DesktopNavbarProps) {
   const { wishlistItems } = useWishlistContext();
   const [searchValue, setSearchValue] = useState("");
   const [accountAnchor, setAccountAnchor] = useState<null | HTMLElement>(null);
-  const [categoryOpen, setCategoryOpen] = useState(false);
-
-  const menuItems = [
-    { label: t("home"), path: "/", exact: true },
-    { label: t("products"), path: "/products", exact: true },
-  ];
-
-  const quickCategoryItems = [
-    { label: "Fashion", path: "/products/FASHION" },
-    { label: "Electronics", path: "/products/ELECTRONICS" },
-    { label: "Beauty", path: "/products/BEAUTY" },
-    { label: "Home & Kitchen", path: "/products/HOME_KITCHEN" },
-    { label: "Food", path: "/products/FOOD" },
-  ];
-
-  const utilityItems = [
-    { label: t("help"), path: "/help" },
-  ];
-
-  const categoryItems = [
-    { label: "All products", path: "/products", icon: "A", desc: "Browse everything" },
-    { label: "Fashion", path: "/products/FASHION", icon: "◇", desc: "Clothing, shoes, bags" },
-    { label: "Women’s Clothing", path: "/products/WOMEN_CLOTHING", icon: "W", desc: "Dresses, tops, daily wear" },
-    { label: "Men’s Clothing", path: "/products/MEN_CLOTHING", icon: "M", desc: "Outerwear, shirts, basics" },
-    { label: "Shoes", path: "/products/SHOES", icon: "S", desc: "Sneakers and footwear" },
-    { label: "Beauty", path: "/products/BEAUTY", icon: "✿", desc: "Makeup and care" },
-    { label: "Skin Care", path: "/products/SKIN_CARE", icon: "S", desc: "Routine essentials" },
-    { label: "Health", path: "/products/HEALTH", icon: "✚", desc: "Wellness products" },
-    { label: "Electronics", path: "/products/ELECTRONICS", icon: "⌁", desc: "Devices and accessories" },
-    { label: "Computers", path: "/products/COMPUTERS", icon: "C", desc: "Laptops and gear" },
-    { label: "Home & Kitchen", path: "/products/HOME_KITCHEN", icon: "H", desc: "Home essentials" },
-    { label: "Food & Grocery", path: "/products/FOOD", icon: "F", desc: "Daily groceries" },
-    { label: "Kids", path: "/products/KIDS", icon: "K", desc: "Family picks" },
-    { label: "Sports & Outdoors", path: "/products/SPORTS_OUTDOORS", icon: "S", desc: "Active lifestyle" },
-    { label: "Pet Supplies", path: "/products/PET_SUPPLIES", icon: "P", desc: "For pets" },
-    { label: "Books & Stationery", path: "/products/BOOKS_STATIONERY", icon: "B", desc: "Reading and office" },
-  ];
 
   const closeAccountMenu = () => setAccountAnchor(null);
 
@@ -89,12 +52,10 @@ export function DesktopNavbar({ sticky = false }: DesktopNavbarProps) {
   };
 
   return (
-    <header className={`site-header ${sticky ? "site-header--sticky" : ""}`}>
+    <header className={`site-header fz-header ${sticky ? "site-header--sticky" : ""}`}>
       <Container maxWidth="xl" className="site-header-container">
         <Box className="site-header-main">
-          <NavLink to="/" className="site-brand" aria-label="FENZO home">
-            <img src="/icons/logo2.png" alt="FENZO" className="site-brand-logo" />
-          </NavLink>
+          <Brand />
 
           <Box component="form" role="search" className="site-search" onSubmit={submitSearch}>
             <SearchRoundedIcon className="site-search-leading" aria-hidden="true" />
@@ -217,85 +178,7 @@ export function DesktopNavbar({ sticky = false }: DesktopNavbarProps) {
           </Box>
         </Box>
 
-        <nav
-          className="site-category-nav"
-          aria-label="Primary navigation"
-          onMouseLeave={() => setCategoryOpen(false)}
-        >
-          <button
-            type="button"
-            className={`site-category-trigger ${categoryOpen ? "is-open" : ""}`}
-            onClick={() => setCategoryOpen((current) => !current)}
-            aria-expanded={categoryOpen}
-            aria-controls="desktop-category-panel"
-          >
-            <CategoryRoundedIcon fontSize="small" />
-            <span>Category</span>
-            <KeyboardArrowDownRoundedIcon className="site-category-trigger-arrow" fontSize="small" />
-          </button>
-
-          {menuItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              exact={item.exact}
-              className="site-category-link"
-              activeClassName="is-active"
-            >
-              {item.label}
-            </NavLink>
-          ))}
-
-          {quickCategoryItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className="site-category-link site-category-link--quick"
-              activeClassName="is-active"
-            >
-              {item.label}
-            </NavLink>
-          ))}
-
-          {utilityItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className="site-category-link"
-              activeClassName="is-active"
-            >
-              {item.label}
-            </NavLink>
-          ))}
-
-          {categoryOpen && (
-            <Box
-              id="desktop-category-panel"
-              className="site-category-panel"
-              role="menu"
-              aria-label="Product categories"
-            >
-              <Box className="site-category-panel-list">
-                {categoryItems.map((category) => (
-                  <NavLink
-                    key={category.path}
-                    to={category.path}
-                    className="site-category-panel-item"
-                    activeClassName="is-active"
-                    role="menuitem"
-                    onClick={() => setCategoryOpen(false)}
-                  >
-                    <span className="site-category-panel-icon" aria-hidden="true">{category.icon}</span>
-                    <span className="site-category-panel-copy">
-                      <strong>{category.label}</strong>
-                      <small>{category.desc}</small>
-                    </span>
-                  </NavLink>
-                ))}
-              </Box>
-            </Box>
-          )}
-        </nav>
+        <CategoryNavigation />
       </Container>
     </header>
   );

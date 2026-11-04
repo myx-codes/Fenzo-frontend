@@ -38,7 +38,7 @@ export function FeaturedProducts() {
         <div className="lp-section-head">
           <div>
             <span className="lp-section-eyebrow">Freshly selected</span>
-            <Typography className="lp-section-title">New and noteworthy</Typography>
+            <Typography component="h2" className="lp-section-title">Freshly selected</Typography>
             <Typography className="lp-section-sub">
               Recently added pieces chosen for quality, utility, and style.
             </Typography>
@@ -124,7 +124,7 @@ export function FeaturedProducts() {
                   </Typography>
 
                   {/* Rating row */}
-                  <Box className="pp-card-rating-row">
+                  <Box className={`pp-card-rating-row ${safeRating === 0 ? "is-unrated" : ""}`}>
                     <Rating
                       value={safeRating}
                       precision={0.5}
@@ -138,7 +138,7 @@ export function FeaturedProducts() {
                       }
                     />
                     <Typography className="pp-card-review-count">
-                      ({safeRating.toFixed(1)})
+                      {safeRating > 0 ? safeRating.toFixed(1) : "No reviews yet"}
                     </Typography>
                     <Box className="pp-card-views">
                       <VisibilityIcon sx={{ fontSize: 12 }} />
@@ -177,6 +177,7 @@ export function FeaturedProducts() {
                           }}
                         >
                           <ShoppingCartIcon sx={{ fontSize: 16 }} />
+                          <span className="signal-cart-label">Add to cart</span>
                         </IconButton>
                       </Tooltip>
 

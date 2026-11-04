@@ -489,9 +489,9 @@ export function ProductCard() {
                     label={product.productCollection}
                     className="pc-collection-badge"
                   />
-                  <IconButton className="pc-zoom-btn">
+                  <span className="pc-zoom-btn" aria-hidden="true">
                     <ZoomInIcon fontSize="small" />
-                  </IconButton>
+                  </span>
                 </Box>
 
                 {/* Image counter */}
@@ -556,7 +556,7 @@ export function ProductCard() {
               </Box>
 
               {/* Product Name */}
-              <Typography className="pc-product-name">
+              <Typography component="h1" className="pc-product-name">
                 {product.productName}
               </Typography>
 
@@ -642,6 +642,7 @@ export function ProductCard() {
                 <Box className="pc-qty-control">
                   <IconButton
                     className="pc-qty-btn"
+                    aria-label="Decrease quantity"
                     onClick={() => handleQuantity("dec")}
                     disabled={quantity <= 1}
                   >
@@ -650,6 +651,7 @@ export function ProductCard() {
                   <Typography className="pc-qty-value">{quantity}</Typography>
                   <IconButton
                     className="pc-qty-btn"
+                    aria-label="Increase quantity"
                     onClick={() => handleQuantity("inc")}
                     disabled={!inStock || quantity >= availableStock}
                   >

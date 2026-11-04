@@ -19,7 +19,8 @@ import ShoppingCartRoundedIcon from "@mui/icons-material/ShoppingCartRounded";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import ViewListRoundedIcon from "@mui/icons-material/ViewListRounded";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import { useHistory, useLocation, useParams } from "react-router-dom";
+import { NavLink, useHistory, useLocation, useParams } from "react-router-dom";
+import { categoryGroups, quickCategories } from "../../components/headers/categoryCatalog";
 import { useDispatch } from "react-redux";
 import { CartItem } from "../../../lib/types/cart";
 import { Product } from "../../../lib/types/product";
@@ -32,33 +33,9 @@ import { useGlobals } from "../../hooks/useGlobals";
 import ProductService from "../../services/ProductService";
 import { setProducts } from "./slice";
 
-const categories: Array<{ name: string; label: string; icon: string; group?: string }> = [
-  { name: "FASHION", label: "Fashion", icon: "◇", group: "Fashion" },
-  { name: "WOMEN_CLOTHING", label: "Women's Clothing", icon: "W", group: "Fashion" },
-  { name: "MEN_CLOTHING", label: "Men's Clothing", icon: "M", group: "Fashion" },
-  { name: "SHOES", label: "Shoes", icon: "S", group: "Fashion" },
-  { name: "BAGS_ACCESSORIES", label: "Bags & Accessories", icon: "B", group: "Fashion" },
-  { name: "BEAUTY", label: "Beauty", icon: "✿", group: "Beauty & Health" },
-  { name: "SKIN_CARE", label: "Skin Care", icon: "S", group: "Beauty & Health" },
-  { name: "MAKEUP", label: "Makeup", icon: "M", group: "Beauty & Health" },
-  { name: "PARFUM", label: "Perfume", icon: "P", group: "Beauty & Health" },
-  { name: "HEALTH", label: "Health", icon: "✚", group: "Beauty & Health" },
-  { name: "VITAMINS", label: "Vitamins", icon: "V", group: "Beauty & Health" },
-  { name: "ELECTRONICS", label: "Electronics", icon: "⌁", group: "Electronics" },
-  { name: "MOBILE_ACCESSORIES", label: "Mobile Accessories", icon: "M", group: "Electronics" },
-  { name: "COMPUTERS", label: "Computers & Laptops", icon: "C", group: "Electronics" },
-  { name: "HOME_KITCHEN", label: "Home & Kitchen", icon: "H", group: "Home & Daily" },
-  { name: "LIVING", label: "Living", icon: "L", group: "Home & Daily" },
-  { name: "FOOD", label: "Food & Grocery", icon: "F", group: "Home & Daily" },
-  { name: "PET_SUPPLIES", label: "Pet Supplies", icon: "P", group: "Home & Daily" },
-  { name: "DAILY_ESSENTIALS", label: "Daily Essentials", icon: "D", group: "Home & Daily" },
-  { name: "KIDS", label: "Kids", icon: "K", group: "Family & Hobby" },
-  { name: "BABY", label: "Baby", icon: "B", group: "Family & Hobby" },
-  { name: "TOYS", label: "Toys", icon: "T", group: "Family & Hobby" },
-  { name: "SPORTS_OUTDOORS", label: "Sports & Outdoors", icon: "S", group: "Family & Hobby" },
-  { name: "BOOKS_STATIONERY", label: "Books & Stationery", icon: "B", group: "Family & Hobby" },
-  { name: "AUTOMOTIVE", label: "Automotive", icon: "A", group: "Family & Hobby" },
-];
+const categories = categoryGroups.flatMap(group => group.items.map(item => ({
+  name: String(item.collection), label: item.label,
+})));
 
 const normalizeCategory = (value?: string): string | null => {
   if (!value) return null;
@@ -219,7 +196,20 @@ export function Products() {
   return (
     <main className="pp-page">
       <Container maxWidth="xl" className="pp-container">
+        <div className="signal-catalog-heading">
+          <nav className="signal-breadcrumbs" aria-label="Breadcrumb"><NavLink exact to="/">Home</NavLink><span>/</span><span>Products</span></nav>
+          <h1>{activeCategory?.label || "All products"}</h1>
+          <p aria-live="polite">{loading && products.length === 0 ? "Finding your next favorite…" : `${products.length}${hasMore ? "+" : ""} products found`}</p>
+        </div>
         <Grid container spacing={3.5} className="pp-layout">
+          <aside className="signal-catalog-nav" aria-label="Browse collections">
+            <NavLink exact to={searchQuery ? `/products?q=${encodeURIComponent(searchQuery)}` : "/products"} className="signal-category-link" activeClassName="is-active">All products</NavLink>
+            {quickCategories.map(category => <NavLink
+              key={category.collection}
+              to={`/products/${category.collection}${searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : ""}`}
+              className="signal-category-link" activeClassName="is-active"
+            >{category.label}</NavLink>)}
+          </aside>
           <Grid size={{ xs: 12 }} className="pp-results-column">
             <Box className="pp-results-toolbar">
               <Box className="pp-active-filters">
@@ -355,7 +345,7 @@ export function Products() {
                           {product.productName}
                         </button>
 
-                        <Box className="pp-card-rating-row">
+                        <Box className={`pp-card-rating-row ${safeRating === 0 ? "is-unrated" : ""}`}>
                           <Rating
                             value={safeRating}
                             precision={0.5}
@@ -366,7 +356,7 @@ export function Products() {
                             emptyIcon={<StarRoundedIcon />}
                           />
                           <Typography className="pp-card-review-count">
-                            {safeRating.toFixed(1)}
+                            {safeRating > 0 ? safeRating.toFixed(1) : "No reviews yet"}
                             {reviewCounts[product._id] ? ` · ${reviewCounts[product._id]} ${reviewCounts[product._id] === 1 ? "review" : "reviews"}` : ""}
                           </Typography>
                           <Box className="pp-card-views" title={`${product.productViews} views`}>
@@ -400,6 +390,7 @@ export function Products() {
                                   onClick={(event) => handleAddToCart(event, product)}
                                 >
                                   <ShoppingCartRoundedIcon />
+                                  <span className="signal-cart-label">{justAdded ? "Added" : "Add to cart"}</span>
                                 </IconButton>
                               </span>
                             </Tooltip>

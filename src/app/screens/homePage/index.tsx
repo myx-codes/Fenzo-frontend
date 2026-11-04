@@ -54,8 +54,8 @@ export default function HomePage() {
   return <div className="homepage">
     <HomeHero/>
     <Statistics/>
-    <Advertisement/>
     <FeaturedProducts/>
+    <Advertisement/>
     <TopBrands/>
     <BestProducts />
     <TopSellers/>

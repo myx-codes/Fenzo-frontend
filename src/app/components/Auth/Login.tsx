@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import {
   ArrowForwardRounded as ArrowIcon,
-  CheckRounded as CheckIcon,
   LockOutlined as LockIcon,
   PersonOutlineRounded as PersonIcon,
   Visibility,
@@ -20,12 +19,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useGlobals } from "../../hooks/useGlobals";
 import { Messages } from "../../../lib/config";
 import "../../../css/auth.css";
-
-const loginBenefits = [
-  "Track every order in one place",
-  "Keep your favorites close",
-  "Enjoy a faster checkout",
-];
+import { Brand } from "../headers/Brand";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
 export function Login() {
   const history = useHistory();
@@ -67,45 +62,32 @@ export function Login() {
   };
 
   return (
-    <main className="auth-page">
+    <main className="auth-page signal-auth">
+      <div className="signal-auth-header"><Brand /><Button onClick={() => history.push("/")} startIcon={<ArrowBackRoundedIcon />}>Back to shopping</Button></div>
       <section className="auth-shell" aria-labelledby="login-heading">
         <aside className="auth-story" aria-label="FENZO membership benefits">
-          <div className="auth-brand">
-            <span className="auth-brand-mark" aria-hidden="true">F</span>
-            <span>FENZO</span>
-          </div>
-
+          <img className="signal-auth-art" src="/img/signal-campaign.webp" alt="Curated everyday essentials on warm stone displays" />
           <div className="auth-story-copy">
-            <p className="auth-eyebrow">Welcome back</p>
-            <h1 className="auth-story-title">
-              Your favorites are <span>waiting.</span>
-            </h1>
+            <p className="auth-eyebrow">A little more everyday</p>
+            <h2 className="auth-story-title">
+              Your favorites.<br />All in one place.
+            </h2>
             <p className="auth-story-description">
               Sign in to continue shopping, follow your orders, and discover picks
               chosen around what you love.
             </p>
           </div>
 
-          <div className="auth-benefits">
-            {loginBenefits.map((benefit) => (
-              <div className="auth-benefit" key={benefit}>
-                <span className="auth-benefit-icon" aria-hidden="true">
-                  <CheckIcon sx={{ fontSize: 18 }} />
-                </span>
-                <p>{benefit}</p>
-              </div>
-            ))}
-          </div>
         </aside>
 
         <div className="auth-form-column">
           <div className="auth-form-wrap">
-            <p className="auth-form-eyebrow">Member access</p>
-            <h2 className="auth-form-title" id="login-heading">
-              {t("loginTitle")}
-            </h2>
+            <p className="auth-form-eyebrow">Your FENZO account</p>
+            <h1 className="auth-form-title" id="login-heading">
+              {t("welcomeBack")}
+            </h1>
             <p className="auth-form-subtitle">
-              Enter your details to continue to your FENZO account.
+              Sign in to your FENZO account.
             </p>
 
             {error && (
