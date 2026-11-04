@@ -191,7 +191,7 @@
 .pc-page .pc-rcard-price { color: var(--signal-ink) !important; }
 .pc-page .pc-rcard-delivery { display: none; }
 
-/* Login retains its original validation, auth request and safe redirect logic. */
+/* Shared Signal auth shell; each form retains its original validation/hooks. */
 .auth-page.signal-auth { min-height: 100vh !important; padding: 0 24px 40px !important; background: var(--signal-canvas) !important; }
 .signal-auth-header { display: flex; align-items: center; justify-content: space-between; min-height: 88px; max-width: 1280px; margin: auto; border-bottom: 1px solid var(--signal-line); }
 .signal-auth-header .MuiButton-root { color: var(--signal-blue-dark); font-size: 13px; }
@@ -212,6 +212,20 @@
 .signal-auth .auth-submit { min-height: 52px !important; border-radius: 8px !important; background: var(--signal-blue) !important; box-shadow: none !important; }
 .signal-auth .auth-switch-button { color: var(--signal-blue-dark) !important; }
 .signal-auth .auth-legal { color: var(--signal-muted); }
+.signal-auth.signal-signup { --auth-primary: var(--signal-blue); --auth-primary-hover: var(--signal-blue-dark); }
+.signal-signup .auth-form-column { padding-block: 28px !important; }
+.signal-signup .auth-form .auth-field-group { margin-bottom: 16px; }
+.signal-signup .auth-form-subtitle { margin-bottom: 24px; }
+.signal-signup .auth-strength-label { color: var(--signal-muted) !important; }
+.signal-signup .auth-field .MuiOutlinedInput-root.Mui-focused { box-shadow: 0 0 0 3px #2358e81a; }
+.signal-signup .auth-field .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline { border-color: var(--signal-blue); }
+@media (max-width: 899px) {
+  .signal-auth.signal-signup .auth-story { min-height: 180px !important; }
+}
+@media (max-width: 599px) {
+  .signal-auth.signal-signup .auth-story { min-height: 120px !important; }
+  .signal-auth.signal-signup .auth-shell { margin-top: 16px; }
+}
 
 @media (max-width: 1350px) {
   .signal-hero { margin-inline: 24px; }

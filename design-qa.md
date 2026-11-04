@@ -267,3 +267,30 @@ Their typography is mapped in source but signed-in content was not visually
 verified. The guest checkout dialog and not-found page were inspected. No
 account, order or payment was created. Final result: passed for public-page
 typography; authenticated visual coverage remains unavailable without login.
+
+## Follow-up: Signal signup
+
+Signup now reuses the login's Signal auth shell, real FENZO brand, ivory canvas,
+navy editorial headings, campaign photograph, white fields and cobalt controls.
+The form is the page's h1; the campaign uses h2. The decorative old lettermark,
+blue gradient panel and repeated benefit list were replaced by the shared shell.
+The campaign photograph is 180px on tablet and 120px on phones to prioritize
+the four-field form. Password-strength text uses readable muted ink while the
+segmented indicator preserves its original scoring/colors.
+
+All field state, strength scoring, validation, signup payload, request handling
+and success navigation remain unchanged. No new image or dependency was added.
+
+Verified 1440x1000, 1024x768, 768x1024, 390x844 and 320x568: four fields remain,
+headings use the shared type scale, and there is no horizontal/control overflow.
+Blank submit shows validation; a synthetic password shows strength 5; mismatched
+confirmation shows an error and matching confirmation clears it. Both password
+visibility controls work. Login/signup switching and Back to shopping work.
+No complete registration was submitted and no account was created.
+
+The source and result were reviewed together in
+`docs/design-qa/signal-signup-comparison.webp`, before left and after right,
+proportionally resized. Five viewport captures are saved as
+`signal-signup-{width}.webp`. Desktop/tablet/mobile layouts were inspected.
+Typecheck, lint, isolated production build and whitespace validation passed.
+No browser errors/warnings recorded. Final result: passed.

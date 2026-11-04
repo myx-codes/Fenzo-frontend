@@ -11,7 +11,6 @@ import {
 import {
   ArrowForwardRounded as ArrowIcon,
   CheckCircleOutlineRounded as CheckIcon,
-  CheckRounded as BenefitIcon,
   LockOutlined as LockIcon,
   PersonOutlineRounded as PersonIcon,
   PhoneOutlined as PhoneIcon,
@@ -22,18 +21,14 @@ import { useHistory } from "react-router-dom";
 import { useGlobals } from "../../hooks/useGlobals";
 import { Messages } from "../../../lib/config";
 import "../../../css/auth.css";
+import { Brand } from "../headers/Brand";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 
 interface StrengthResult {
   score: number;
   label: string;
   color: string;
 }
-
-const signupBenefits = [
-  "A personal shopping space",
-  "Saved products across devices",
-  "Simple and secure checkout",
-];
 
 function getStrength(password: string): StrengthResult {
   if (!password) return { score: 0, label: "", color: "#e4e7ec" };
@@ -108,45 +103,32 @@ export function Signup() {
   };
 
   return (
-    <main className="auth-page">
+    <main className="auth-page signal-auth signal-signup">
+      <div className="signal-auth-header"><Brand /><Button onClick={() => history.push("/")} startIcon={<ArrowBackRoundedIcon />}>Back to shopping</Button></div>
       <section className="auth-shell" aria-labelledby="signup-heading">
         <aside className="auth-story" aria-label="FENZO membership benefits">
-          <div className="auth-brand">
-            <span className="auth-brand-mark" aria-hidden="true">F</span>
-            <span>FENZO</span>
-          </div>
-
+          <img className="signal-auth-art" src="/img/signal-campaign.webp" alt="Curated everyday essentials on warm stone displays" />
           <div className="auth-story-copy">
-            <p className="auth-eyebrow">Start your journey</p>
-            <h1 className="auth-story-title">
-              Discover more. <span>Shop your way.</span>
-            </h1>
+            <p className="auth-eyebrow">A little more everyday</p>
+            <h2 className="auth-story-title">
+              Good finds.<br />Made personal.
+            </h2>
             <p className="auth-story-description">
               Create your account and make every visit more personal, from saved
               finds to effortless order tracking.
             </p>
           </div>
 
-          <div className="auth-benefits">
-            {signupBenefits.map((benefit) => (
-              <div className="auth-benefit" key={benefit}>
-                <span className="auth-benefit-icon" aria-hidden="true">
-                  <BenefitIcon sx={{ fontSize: 18 }} />
-                </span>
-                <p>{benefit}</p>
-              </div>
-            ))}
-          </div>
         </aside>
 
         <div className="auth-form-column">
           <div className="auth-form-wrap">
             <p className="auth-form-eyebrow">Create an account</p>
-            <h2 className="auth-form-title" id="signup-heading">
+            <h1 className="auth-form-title" id="signup-heading">
               {t("signupTitle")}
-            </h2>
+            </h1>
             <p className="auth-form-subtitle">
-              Join FENZO in a few moments. All fields marked required must be completed.
+              Save your favorites, follow your orders, and discover more with FENZO.
             </p>
 
             {error && (
