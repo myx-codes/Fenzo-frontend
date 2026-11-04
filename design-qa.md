@@ -184,3 +184,20 @@ Keyboard/browser semantics were checked; physical-device and screen-reader
 speech testing were not performed. Current backend data may change naturally.
 
 P3: a supplied horizontal vector brand asset would improve the tiny brand mark.
+
+## Follow-up: homepage spacing and progressive categories
+
+The brand strip between The Tech Edit and Popular right now inherited 88px
+vertical padding and white brand labels. Reduced it from about 365px to 119px,
+with 16px/20px padding, a 56px track, and readable navy/gray labels on ivory.
+
+All categories now opens with four collapsed group buttons. Selecting a group
+reveals only its children; selecting another closes the previous group. Reopening
+the menu resets all groups. All 28 original category destinations were checked
+across the four groups (6/8/6/8).
+
+Browser checks passed at desktop, 390px, 320px and 667px landscape: initial zero
+child links, single-group expansion, toggle collapse, route navigation, Escape
+and focus restoration, ArrowDown/Up, Home/End support, and outside-click closure.
+No horizontal overflow; long mobile lists scroll within the bounded panel.
+Typecheck, lint, diff whitespace validation and production build passed.

@@ -65,6 +65,12 @@
 .homepage .ad-title { font-family: var(--signal-editorial) !important; font-weight: 400 !important; font-size: 44px !important; }
 .homepage .ad-btn-primary { background: var(--signal-blue) !important; color: #fff !important; border-radius: 8px !important; }
 .homepage .brands-section, .homepage .top-sellers-section, .homepage .big-sales-section { background: var(--signal-canvas) !important; }
+.homepage .brands-section { padding: 16px 0 20px !important; }
+.homepage .brands-intro .lp-section-title { margin: 0 !important; font-family: inherit !important; font-size: 14px !important; font-weight: 500 !important; letter-spacing: 0 !important; color: var(--signal-muted) !important; }
+.homepage .brands-track-wrap { margin-top: 12px !important; height: 56px !important; border-color: var(--signal-line) !important; }
+.homepage .brand-slide { height: 56px !important; }
+.homepage .brand-slide span { color: var(--signal-muted); }
+.homepage .brand-slide span:hover { color: var(--signal-ink); }
 
 /* A consistent catalog card for home and listing surfaces. */
 :is(.homepage .lp-products-section, .pp-page) .pp-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px !important; }

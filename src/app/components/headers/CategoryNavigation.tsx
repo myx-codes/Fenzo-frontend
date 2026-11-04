@@ -12,6 +12,7 @@ export function CategoryNavigation({ compact = false }: { compact?: boolean }) {
   const { t, authUser } = useGlobals();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
   const [availableHeight, setAvailableHeight] = useState(480);
   const rootRef = useRef<HTMLElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -25,6 +26,7 @@ export function CategoryNavigation({ compact = false }: { compact?: boolean }) {
   };
 
   useEffect(() => { setOpen(false); }, [location.pathname, location.search]);
+  useEffect(() => { if (!open) setExpandedGroup(null); }, [open]);
 
   useLayoutEffect(() => {
     if (!open) return;
@@ -40,7 +42,7 @@ export function CategoryNavigation({ compact = false }: { compact?: boolean }) {
     window.addEventListener("scroll", measure, { passive: true });
     viewport?.addEventListener("resize", measure);
     if (focusOnOpen.current) {
-      const links = panelRef.current?.querySelectorAll<HTMLAnchorElement>("[data-category-link]");
+      const links = panelRef.current?.querySelectorAll<HTMLElement>("[data-category-control]");
       const link = focusOnOpen.current === "last" ? links?.[links.length - 1] : links?.[0];
       link?.focus();
       focusOnOpen.current = null;
@@ -73,21 +75,18 @@ export function CategoryNavigation({ compact = false }: { compact?: boolean }) {
   }, [open]);
 
   const navigateLinks = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const links = Array.from(panelRef.current?.querySelectorAll<HTMLAnchorElement>("[data-category-link]") || []);
-    const index = links.indexOf(event.target as HTMLAnchorElement);
+    const links = Array.from(panelRef.current?.querySelectorAll<HTMLElement>("[data-category-control]") || []);
+    const index = links.indexOf(event.target as HTMLElement);
     if (index < 0) return;
-    let next: HTMLAnchorElement | undefined;
+    let next: HTMLElement | undefined;
     if (event.key === "ArrowDown") next = links[(index + 1) % links.length];
     if (event.key === "ArrowUp") next = links[(index - 1 + links.length) % links.length];
     if (event.key === "Home") next = links[0];
     if (event.key === "End") next = links[links.length - 1];
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      const group = Number(links[index].dataset.group);
-      const row = Number(links[index].dataset.row);
-      const direction = event.key === "ArrowRight" ? 1 : -1;
-      const nextGroup = (group + direction + categoryGroups.length) % categoryGroups.length;
-      const column = links.filter(link => Number(link.dataset.group) === nextGroup);
-      next = column[Math.min(row, column.length - 1)];
+    if (event.key === "ArrowLeft") {
+      const group = links[index].closest(".fz-mega-group");
+      next = group?.querySelector<HTMLButtonElement>(".fz-mega-group-toggle") || undefined;
+      setExpandedGroup(null);
     }
     if (next) {
       event.preventDefault();
@@ -117,7 +116,7 @@ export function CategoryNavigation({ compact = false }: { compact?: boolean }) {
             if (event.key === "ArrowDown" || event.key === "ArrowUp") {
               event.preventDefault();
               if (open) {
-                const links = panelRef.current?.querySelectorAll<HTMLAnchorElement>("[data-category-link]");
+                const links = panelRef.current?.querySelectorAll<HTMLElement>("[data-category-control]");
                 (event.key === "ArrowDown" ? links?.[0] : links?.[links.length - 1])?.focus();
               } else {
                 focusOnOpen.current = event.key === "ArrowDown" ? "first" : "last";
@@ -162,19 +161,27 @@ export function CategoryNavigation({ compact = false }: { compact?: boolean }) {
           <button type="button" className="fz-mega-close" aria-label="Close categories" onClick={() => close(true)}><CloseRoundedIcon /></button>
         </div>
         <div className="fz-mega-body">
-          {categoryGroups.map((group, groupIndex) => (
+          {categoryGroups.map(group => (
             <section key={group.id} className="fz-mega-group" aria-labelledby={`${panelId}-${group.id}`}>
-              <h3 id={`${panelId}-${group.id}`}><group.Icon aria-hidden="true" /><span>{group.label}</span></h3>
-              <ul>
-                {group.items.map((item, rowIndex) => <li key={item.collection}>
+              <h3><button
+                id={`${panelId}-${group.id}`}
+                type="button"
+                className="fz-mega-group-toggle"
+                data-category-control
+                aria-expanded={expandedGroup === group.id}
+                aria-controls={`${panelId}-${group.id}-items`}
+                onClick={() => setExpandedGroup(current => current === group.id ? null : group.id)}
+              ><group.Icon aria-hidden="true" /><span>{group.label}</span><ExpandMoreRoundedIcon className="fz-group-chevron" aria-hidden="true" /></button></h3>
+              {expandedGroup === group.id && <ul id={`${panelId}-${group.id}-items`}>
+                {group.items.map(item => <li key={item.collection}>
                   <NavLink
                     exact to={`/products/${item.collection}`}
                     className="fz-mega-link" activeClassName="is-active"
-                    data-category-link data-group={groupIndex} data-row={rowIndex}
+                    data-category-link data-category-control
                     onClick={() => close()}
                   >{item.label}</NavLink>
                 </li>)}
-              </ul>
+              </ul>}
             </section>
           ))}
         </div>
